@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>EH Portal • Serwery RP</title>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -27,315 +26,264 @@
                             border: '#3F4147',
                             input: '#383A40'
                         }
-                    },
-                    animation: {
-                        'fade-in': 'fadeIn 0.3s ease-out',
-                        'slide-up': 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-                        'pulse-soft': 'pulseSoft 2s infinite',
-                        'scale-in': 'scaleIn 0.2s ease-out'
-                    },
-                    keyframes: {
-                        fadeIn: {
-                            '0%': { opacity: '0' },
-                            '100%': { opacity: '1' }
-                        },
-                        slideUp: {
-                            '0%': { transform: 'translateY(20px)', opacity: '0' },
-                            '100%': { transform: 'translateY(0)', opacity: '1' }
-                        },
-                        pulseSoft: {
-                            '0%, 100%': { opacity: '1' },
-                            '50%': { opacity: '0.7' }
-                        },
-                        scaleIn: {
-                            '0%': { transform: 'scale(0.95)', opacity: '0' },
-                            '100%': { transform: 'scale(1)', opacity: '1' }
-                        }
                     }
                 }
             }
         }
     </script>
     
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- Firebase SDK (tylko baza danych) -->
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     
     <style>
-        /* Custom Scrollbar */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
         ::-webkit-scrollbar-track {
             background: #2B2D31;
-            border-radius: 4px;
+            border-radius: 3px;
         }
         ::-webkit-scrollbar-thumb {
             background: #1A1B1E;
-            border-radius: 4px;
-            border: 2px solid #2B2D31;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #111214;
-        }
-        
-        .tab-content {
-            animation: fadeIn 0.25s ease-out;
-        }
-        
-        input:focus, textarea:focus {
-            box-shadow: 0 0 0 2px rgba(88, 101, 242, 0.3);
+            border-radius: 3px;
         }
         
         .server-card {
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.2s ease;
+            cursor: pointer;
         }
         .server-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.24);
-            border-color: #5865F2;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            border-color: #5865F2 !important;
         }
         
-        .online-dot {
-            box-shadow: 0 0 8px rgba(35, 165, 90, 0.6);
+        .verified-badge {
+            background: linear-gradient(135deg, #5865F2, #7289DA);
+            box-shadow: 0 2px 10px rgba(88, 101, 242, 0.4);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slideUp {
+            animation: slideUp 0.4s ease-out;
         }
     </style>
 </head>
-<body class="h-screen overflow-hidden flex flex-col bg-discord-bg text-discord-text font-sans antialiased">
+<body class="h-screen overflow-hidden flex flex-col bg-[#313338] text-[#DBDEE1]" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
 
-    <!-- ==================== EKRAN LOGOWANIA ADMINA ==================== -->
-    <div id="auth-screen" class="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-discord-darker/95 backdrop-blur-sm">
-        <div class="bg-discord-bg p-8 rounded-2xl shadow-2xl w-full max-w-md border border-discord-border animate-scale-in">
+    <!-- EKRAN LOGOWANIA -->
+    <div id="auth-screen" class="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-[#1E1F22]">
+        <div class="bg-[#313338] p-8 rounded-2xl shadow-2xl w-full max-w-md border border-[#3F4147] animate-fadeIn">
             
-            <!-- Logo -->
-            <div class="flex flex-col items-center mb-8">
-                <div class="w-16 h-16 bg-discord-blurple rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-discord-blurple/25">
-                    <i data-lucide="gamepad-2" class="w-8 h-8 text-white"></i>
+            <div class="flex flex-col items-center mb-6">
+                <div class="w-16 h-16 bg-[#5865F2] rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+                    <span class="text-2xl font-bold text-white">EH</span>
                 </div>
-                <h1 class="text-2xl font-bold text-white tracking-tight">EH Portal</h1>
-                <p class="text-sm text-discord-muted mt-1">Centrum serwerów RolePlay</p>
+                <h1 class="text-2xl font-bold text-white">EH Portal</h1>
+                <p class="text-sm text-[#949BA4] mt-1">Centrum serwerów RolePlay</p>
             </div>
             
-            <!-- Formularz logowania -->
+            <!-- Login Admin -->
             <div class="space-y-4">
                 <div class="relative">
-                    <i data-lucide="key" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-discord-muted"></i>
                     <input type="password" id="admin-code-input" placeholder="Wpisz kod administratora" 
-                           class="w-full bg-discord-input pl-10 pr-4 py-3 rounded-xl text-sm outline-none ring-1 ring-discord-border focus:ring-discord-blurple transition-all placeholder:text-discord-muted/60">
+                           class="w-full bg-[#1E1F22] px-4 py-3 rounded-xl text-sm outline-none ring-1 ring-[#3F4147] focus:ring-[#5865F2] transition-all placeholder:text-[#949BA4]">
                 </div>
                 
                 <button onclick="loginAsAdmin()" 
-                        class="w-full bg-discord-blurple hover:bg-[#4752C4] py-3 rounded-xl font-semibold text-sm transition-all hover:shadow-lg hover:shadow-discord-blurple/20 active:scale-95">
-                    <i data-lucide="log-in" class="w-4 h-4 inline mr-2"></i>
-                    Zaloguj jako Admin
+                        class="w-full bg-[#5865F2] hover:bg-[#4752C4] py-3 rounded-xl font-semibold text-sm transition-all active:scale-95">
+                    🔑 Zaloguj jako Admin
                 </button>
                 
-                <div class="text-center">
-                    <button onclick="loginAsGuest()" 
-                            class="text-discord-muted hover:text-white text-sm transition-colors">
-                        <i data-lucide="user" class="w-4 h-4 inline mr-1"></i>
-                        Wejdź jako gość
-                    </button>
+                <div class="relative my-4">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-[#3F4147]"></div>
+                    </div>
+                    <div class="relative flex justify-center text-xs">
+                        <span class="px-2 bg-[#313338] text-[#949BA4]">lub</span>
+                    </div>
                 </div>
                 
-                <p class="text-[10px] text-discord-muted/50 text-center mt-4">
-                    EH Portal 2026 • Serwery RolePlay
-                </p>
+                <button onclick="loginAsGuest()" 
+                        class="w-full border border-[#3F4147] hover:border-[#5865F2] text-white py-3 rounded-xl font-semibold text-sm transition-all active:scale-95">
+                    👤 Wejdź jako gość
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- ==================== GŁÓWNA APLIKACJA ==================== -->
+    <!-- GŁÓWNA APLIKACJA -->
     <div id="main-app" class="hidden flex h-full w-full">
         
-        <!-- Lewy Sidebar -->
-        <nav class="w-[72px] bg-discord-sidebar flex flex-col items-center py-3 space-y-2 border-r border-black/20 shrink-0">
-            <div class="w-12 h-12 bg-discord-blurple rounded-2xl flex items-center justify-center text-white font-bold text-xl mb-2 shadow-md">
+        <!-- Sidebar -->
+        <nav class="w-[72px] bg-[#1E1F22] flex flex-col items-center py-3 space-y-2 border-r border-black/20">
+            <div class="w-12 h-12 bg-[#5865F2] rounded-2xl flex items-center justify-center text-white font-bold text-lg mb-2">
                 EH
             </div>
             
-            <div class="w-8 border-t border-discord-border my-1"></div>
+            <div class="w-8 border-t border-[#3F4147] my-1"></div>
             
             <!-- Czat -->
-            <button onclick="showTab('chat')" id="nav-chat" 
-                    class="nav-btn w-12 h-12 rounded-2xl flex items-center justify-center text-discord-muted hover:text-white hover:bg-discord-blurple hover:rounded-xl transition-all duration-200 group relative active:scale-90"
-                    title="Czat ogólny">
+            <button onclick="switchTab('chat')" id="nav-chat" 
+                    class="nav-btn w-12 h-12 rounded-2xl flex items-center justify-center text-[#949BA4] hover:text-white hover:bg-[#5865F2] hover:rounded-xl transition-all duration-200 relative group">
                 <i data-lucide="message-square" class="w-6 h-6"></i>
-                <span class="absolute left-14 bg-black text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">Czat</span>
+                <span class="absolute left-14 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">Czat</span>
             </button>
             
-            <!-- Wyszukiwarka serwerów -->
-            <button onclick="showTab('discover')" id="nav-discover" 
-                    class="nav-btn w-12 h-12 rounded-2xl flex items-center justify-center text-discord-muted hover:text-white hover:bg-discord-green hover:rounded-xl transition-all duration-200 group relative active:scale-90"
-                    title="Odkrywaj serwery">
+            <!-- Przeglądaj serwery -->
+            <button onclick="switchTab('discover')" id="nav-discover" 
+                    class="nav-btn w-12 h-12 rounded-2xl flex items-center justify-center text-[#949BA4] hover:text-white hover:bg-[#23A55A] hover:rounded-xl transition-all duration-200 relative group">
                 <i data-lucide="compass" class="w-6 h-6"></i>
-                <span class="absolute left-14 bg-black text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">Przeglądaj</span>
+                <span class="absolute left-14 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">Serwery</span>
             </button>
             
             <!-- Dodaj serwer -->
-            <button onclick="showTab('apply')" id="nav-apply" 
-                    class="nav-btn w-12 h-12 rounded-2xl flex items-center justify-center text-discord-muted hover:text-white hover:bg-discord-green hover:rounded-xl transition-all duration-200 group relative active:scale-90"
-                    title="Dodaj własny serwer">
+            <button onclick="switchTab('add')" id="nav-add" 
+                    class="nav-btn w-12 h-12 rounded-2xl flex items-center justify-center text-[#949BA4] hover:text-white hover:bg-[#23A55A] hover:rounded-xl transition-all duration-200 relative group">
                 <i data-lucide="plus-circle" class="w-6 h-6"></i>
-                <span class="absolute left-14 bg-black text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">Dodaj serwer</span>
+                <span class="absolute left-14 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">Dodaj</span>
             </button>
             
-            <!-- Admin (widoczny tylko dla admina) -->
-            <button onclick="showTab('admin')" id="admin-btn" 
-                    class="nav-btn hidden w-12 h-12 rounded-2xl flex items-center justify-center text-discord-muted hover:text-white hover:bg-discord-red hover:rounded-xl transition-all duration-200 group relative active:scale-90"
-                    title="Panel administratora">
+            <!-- Admin -->
+            <button onclick="switchTab('admin')" id="admin-btn" 
+                    class="nav-btn hidden w-12 h-12 rounded-2xl flex items-center justify-center text-[#949BA4] hover:text-white hover:bg-[#ED4245] hover:rounded-xl transition-all duration-200 relative group">
                 <i data-lucide="shield-alert" class="w-6 h-6"></i>
-                <span class="absolute left-14 bg-black text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">Admin</span>
+                <span class="absolute left-14 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">Admin</span>
             </button>
             
             <div class="flex-1"></div>
             
             <!-- Wyloguj -->
             <button onclick="logout()" 
-                    class="w-12 h-12 rounded-2xl flex items-center justify-center text-discord-muted hover:text-white hover:bg-discord-red/80 hover:rounded-xl transition-all duration-200 group relative active:scale-90"
-                    title="Wyloguj się">
+                    class="w-12 h-12 rounded-2xl flex items-center justify-center text-[#949BA4] hover:text-white hover:bg-[#ED4245] hover:rounded-xl transition-all duration-200 relative group">
                 <i data-lucide="log-out" class="w-6 h-6"></i>
-                <span class="absolute left-14 bg-black text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">Wyloguj</span>
             </button>
         </nav>
 
-        <!-- Główna treść -->
-        <div class="flex-1 flex flex-col min-w-0 bg-discord-bg">
+        <!-- Main -->
+        <div class="flex-1 flex flex-col min-w-0 bg-[#313338]">
             
             <!-- Header -->
-            <header class="h-12 min-h-[48px] border-b border-discord-border bg-discord-bg flex items-center px-5 shadow-sm z-10">
-                <div class="flex items-center gap-3">
-                    <span class="text-discord-muted text-xl font-light">#</span>
-                    <span id="header-text" class="font-semibold text-white text-sm tracking-wide uppercase">CZAT OGÓLNY</span>
-                </div>
+            <header class="h-12 min-h-[48px] border-b border-[#3F4147] bg-[#313338] flex items-center px-5 shadow-sm">
+                <span class="text-[#949BA4] text-xl mr-3">#</span>
+                <span id="header-title" class="font-semibold text-white text-sm uppercase tracking-wide">CZAT OGÓLNY</span>
                 <div class="ml-auto flex items-center gap-3">
-                    <span id="user-badge" class="text-xs bg-discord-blurple/20 text-discord-blurple px-2 py-1 rounded-full font-medium"></span>
-                    <span class="text-xs text-discord-muted">EH Portal v2.0</span>
+                    <span id="user-badge" class="text-xs bg-[#5865F2]/20 text-[#5865F2] px-3 py-1 rounded-full font-medium"></span>
                 </div>
             </header>
 
-            <!-- ==================== WIDOK: CZAT ==================== -->
-            <div id="tab-chat" class="tab-content flex-1 flex flex-col overflow-hidden bg-discord-bg">
-                <div id="chat-box" class="flex-1 overflow-y-auto px-5 py-4 space-y-1.5 scroll-smooth"></div>
+            <!-- CZAT -->
+            <div id="tab-chat" class="tab-content flex-1 flex flex-col overflow-hidden bg-[#313338]">
+                <div id="chat-messages" class="flex-1 overflow-y-auto px-5 py-4 space-y-2"></div>
                 
                 <div class="px-4 pb-4 pt-1">
-                    <div class="bg-discord-input rounded-xl flex items-center px-4 ring-1 ring-transparent focus-within:ring-discord-blurple/50 transition-all">
-                        <input type="text" id="chat-in" 
-                               class="bg-transparent flex-1 py-3.5 outline-none text-sm placeholder:text-discord-muted/50" 
+                    <div class="bg-[#383A40] rounded-xl flex items-center px-4 ring-1 ring-transparent focus-within:ring-[#5865F2]/50 transition-all">
+                        <input type="text" id="chat-input" 
+                               class="bg-transparent flex-1 py-3.5 outline-none text-sm placeholder:text-[#949BA4]/50" 
                                placeholder="Napisz wiadomość...">
-                        <i data-lucide="send" class="w-5 h-5 text-discord-muted ml-3 cursor-pointer hover:text-white transition-colors" 
-                           onclick="sendChatMessage()"></i>
+                        <button onclick="sendMessage()" class="text-[#949BA4] hover:text-white transition-colors p-1">
+                            <i data-lucide="send" class="w-5 h-5"></i>
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- ==================== WIDOK: WYSZUKIWARKA SERWERÓW ==================== -->
+            <!-- PRZEGLĄDAJ SERWERY -->
             <div id="tab-discover" class="tab-content hidden flex-1 flex flex-col overflow-hidden">
-                <div class="bg-discord-dark border-b border-discord-border p-6">
-                    <div class="max-w-4xl mx-auto">
-                        <h2 class="text-2xl font-bold text-white mb-2 flex items-center gap-2">
-                            <i data-lucide="compass" class="w-7 h-7 text-discord-green"></i>
-                            Odkrywaj serwery RolePlay
-                        </h2>
-                        <p class="text-discord-muted text-sm mb-4">Przeglądaj serwery dodane przez społeczność</p>
+                <div class="bg-[#2B2D31] border-b border-[#3F4147] p-6">
+                    <div class="max-w-5xl mx-auto">
+                        <h2 class="text-2xl font-bold text-white mb-2">🧭 Odkrywaj serwery RolePlay</h2>
+                        <p class="text-[#949BA4] text-sm mb-4">Przeglądaj zweryfikowane i dodane przez społeczność serwery</p>
                         
                         <div class="relative">
-                            <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-discord-muted"></i>
                             <input type="text" id="search-input" oninput="filterServers()"
-                                   placeholder="Szukaj serwera po nazwie, kodzie EH lub opisie..."
-                                   class="w-full bg-discord-darker pl-12 pr-4 py-3.5 rounded-xl text-sm outline-none ring-1 ring-discord-border focus:ring-discord-blurple transition-all placeholder:text-discord-muted/50">
+                                   placeholder="Szukaj po nazwie, kodzie EH lub opisie..."
+                                   class="w-full bg-[#1E1F22] px-4 py-3.5 rounded-xl text-sm outline-none ring-1 ring-[#3F4147] focus:ring-[#5865F2] transition-all placeholder:text-[#949BA4]/50">
                         </div>
                         
-                        <div class="flex gap-4 mt-3 text-xs text-discord-muted">
-                            <span id="servers-count">0</span> serwerów
-                            <span class="text-discord-border">•</span>
-                            <span id="filtered-count">0</span> wyświetlanych
+                        <div class="flex gap-4 mt-3 text-xs text-[#949BA4]">
+                            <span>Łącznie: <span id="total-servers">0</span></span>
+                            <span>•</span>
+                            <span>Wyświetlono: <span id="filtered-servers">0</span></span>
                         </div>
                     </div>
                 </div>
                 
-                <div id="servers-grid" class="flex-1 overflow-y-auto p-6">
-                    <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-                    <div id="no-servers-message" class="hidden text-center py-20">
-                        <i data-lucide="search-x" class="w-16 h-16 text-discord-muted/30 mx-auto mb-4"></i>
-                        <p class="text-discord-muted text-lg">Nie znaleziono serwerów</p>
+                <div id="servers-container" class="flex-1 overflow-y-auto p-6">
+                    <div id="servers-grid" class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                    <div id="no-servers" class="hidden text-center py-20">
+                        <p class="text-[#949BA4] text-lg">😔 Nie znaleziono serwerów</p>
                     </div>
                 </div>
             </div>
 
-            <!-- ==================== WIDOK: DODAJ SERWER ==================== -->
-            <div id="tab-apply" class="tab-content hidden flex-1 overflow-y-auto">
-                <div class="max-w-lg mx-auto p-8 animate-slide-up">
-                    <div class="bg-discord-dark p-8 rounded-2xl border border-discord-border shadow-xl">
-                        <div class="flex items-center gap-3 mb-6">
-                            <div class="w-10 h-10 bg-discord-green/20 rounded-xl flex items-center justify-center">
-                                <i data-lucide="server" class="w-5 h-5 text-discord-green"></i>
-                            </div>
-                            <div>
-                                <h2 class="text-xl font-bold text-white">Dodaj swój serwer</h2>
-                                <p class="text-xs text-discord-muted">Zgłoś serwer do zatwierdzenia</p>
-                            </div>
-                        </div>
+            <!-- DODAJ SERWER -->
+            <div id="tab-add" class="tab-content hidden flex-1 overflow-y-auto">
+                <div class="max-w-lg mx-auto p-8 animate-fadeIn">
+                    <div class="bg-[#2B2D31] p-8 rounded-2xl border border-[#3F4147]">
+                        <h2 class="text-xl font-bold text-white mb-2">➕ Dodaj serwer</h2>
+                        <p class="text-xs text-[#949BA4] mb-6" id="add-info-text">Twoje zgłoszenie zostanie sprawdzone przez admina</p>
                         
                         <div class="space-y-4">
-                            <div>
-                                <label class="text-xs font-semibold text-discord-muted uppercase tracking-wide mb-1.5 block">Nazwa serwera</label>
-                                <input id="s-name" placeholder="np. Grand RP" 
-                                       class="w-full bg-discord-darker p-3 rounded-xl text-sm outline-none ring-1 ring-discord-border focus:ring-discord-green transition-all">
-                            </div>
+                            <input id="server-name" placeholder="Nazwa serwera *" 
+                                   class="w-full bg-[#1E1F22] p-3 rounded-xl text-sm outline-none ring-1 ring-[#3F4147] focus:ring-[#23A55A] transition-all">
+                            <input id="server-code" placeholder="Kod EH (np. 111-222)" 
+                                   class="w-full bg-[#1E1F22] p-3 rounded-xl text-sm outline-none ring-1 ring-[#3F4147] focus:ring-[#23A55A] transition-all font-mono">
+                            <textarea id="server-desc" rows="5" placeholder="Opis serwera, regulamin, co oferuje..."
+                                      class="w-full bg-[#1E1F22] p-3 rounded-xl text-sm outline-none ring-1 ring-[#3F4147] focus:ring-[#23A55A] transition-all resize-none"></textarea>
                             
-                            <div>
-                                <label class="text-xs font-semibold text-discord-muted uppercase tracking-wide mb-1.5 block">Kod EH</label>
-                                <input id="s-code" placeholder="np. 111-222" 
-                                       class="w-full bg-discord-darker p-3 rounded-xl text-sm outline-none ring-1 ring-discord-border focus:ring-discord-green transition-all font-mono">
-                            </div>
-                            
-                            <div>
-                                <label class="text-xs font-semibold text-discord-muted uppercase tracking-wide mb-1.5 block">Opis / Regulamin</label>
-                                <textarea id="s-desc" rows="5" placeholder="Opisz swój serwer..."
-                                          class="w-full bg-discord-darker p-3 rounded-xl text-sm outline-none ring-1 ring-discord-border focus:ring-discord-green transition-all resize-none"></textarea>
-                            </div>
-                            
-                            <button onclick="sendSrv()" 
-                                    class="w-full bg-discord-green hover:bg-[#1E8A4A] py-3.5 rounded-xl font-semibold text-sm transition-all hover:shadow-lg hover:shadow-discord-green/20 active:scale-95 mt-2">
-                                <i data-lucide="upload" class="w-4 h-4 inline mr-2"></i>
-                                Wyślij do zatwierdzenia
+                            <button onclick="addServer()" 
+                                    class="w-full bg-[#23A55A] hover:bg-[#1E8A4A] py-3.5 rounded-xl font-semibold text-sm transition-all active:scale-95">
+                                📤 Wyślij
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ==================== WIDOK: PANEL ADMINA ==================== -->
+            <!-- PANEL ADMINA -->
             <div id="tab-admin" class="tab-content hidden flex-1 overflow-y-auto">
-                <div class="max-w-3xl mx-auto p-8 animate-slide-up">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-10 h-10 bg-discord-red/20 rounded-xl flex items-center justify-center">
-                            <i data-lucide="shield-alert" class="w-5 h-5 text-discord-red"></i>
-                        </div>
-                        <div>
-                            <h2 class="text-xl font-bold text-discord-red">Panel Administratora</h2>
-                            <p class="text-xs text-discord-muted">Zarządzaj zgłoszeniami serwerów</p>
+                <div class="max-w-4xl mx-auto p-8 animate-fadeIn">
+                    <h2 class="text-2xl font-bold text-[#ED4245] mb-2">🛡️ Panel Administratora</h2>
+                    <p class="text-sm text-[#949BA4] mb-6">Zarządzaj zgłoszeniami i weryfikuj serwery</p>
+                    
+                    <!-- Sekcja: Oczekujące zgłoszenia -->
+                    <div class="mb-8">
+                        <h3 class="text-lg font-bold text-white mb-3">📋 Oczekujące zgłoszenia</h3>
+                        <div id="admin-requests" class="space-y-3"></div>
+                        <div id="no-requests" class="hidden text-center py-10 text-[#949BA4]">
+                            ✅ Brak oczekujących zgłoszeń
                         </div>
                     </div>
                     
-                    <div id="admin-list" class="space-y-3"></div>
-                    
-                    <div id="no-requests-message" class="hidden text-center py-16">
-                        <i data-lucide="inbox" class="w-16 h-16 text-discord-muted/30 mx-auto mb-4"></i>
-                        <p class="text-discord-muted text-lg">Brak oczekujących zgłoszeń</p>
+                    <!-- Sekcja: Wszystkie serwery (do weryfikacji) -->
+                    <div>
+                        <h3 class="text-lg font-bold text-white mb-3">✅ Zarządzaj serwerami (weryfikacja)</h3>
+                        <div id="admin-all-servers" class="space-y-3"></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ==================== SKRYPTY ==================== -->
     <script>
-        // --- KONFIGURACJA FIREBASE (tylko baza danych) ---
+        // ============ FIREBASE ============
         const firebaseConfig = {
             apiKey: "AIzaSyAG7tgMkouem-YVmGCPOYO64Fb3zUGWs7w",
             authDomain: "eh-portal-87389.firebaseapp.com",
@@ -343,58 +291,54 @@
             projectId: "eh-portal-87389",
             storageBucket: "eh-portal-87389.appspot.com",
             messagingSenderId: "393601722792",
-            appId: "1:393601722792:web:f5549c97312a2236f0d59d",
-            measurementId: "G-RXBY6BKTZ1"
+            appId: "1:393601722792:web:f5549c97312a2236f0d59d"
         };
-
+        
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-
-        // --- ZMIENNE ---
+        
+        // ============ STAN APLIKACJI ============
         let currentUser = null;
         let isAdmin = false;
         let allServers = [];
-
-        // --- LOGOWANIE ---
+        
+        // ============ LOGOWANIE ============
         function loginAsAdmin() {
             const code = document.getElementById('admin-code-input').value.trim();
             if (code === 'EH2026') {
                 isAdmin = true;
-                currentUser = { name: 'Administrator', isAdmin: true };
+                currentUser = { name: 'Administrator', type: 'admin' };
                 enterApp();
-                showToast('Zalogowano jako Administrator 🛡️', 'success');
+                showNotification('Zalogowano jako Administrator 🛡️', 'success');
             } else {
-                showToast('Nieprawidłowy kod!', 'error');
+                showNotification('❌ Nieprawidłowy kod!', 'error');
             }
         }
-
+        
         function loginAsGuest() {
             isAdmin = false;
-            const guestNames = ['Gracz', 'Roleplayer', 'NoName', 'GraczRP', 'FanRP'];
-            const randomName = guestNames[Math.floor(Math.random() * guestNames.length)] + Math.floor(Math.random() * 1000);
-            currentUser = { name: randomName, isAdmin: false };
+            const names = ['GraczRP', 'Roleplayer', 'FanRP', 'Gracz', 'Nowy'];
+            const randomName = names[Math.floor(Math.random() * names.length)] + Math.floor(Math.random() * 999);
+            currentUser = { name: randomName, type: 'guest' };
             enterApp();
-            showToast('Zalogowano jako gość 👋', 'info');
+            showNotification('Witaj ' + randomName + '! 👋', 'info');
         }
-
+        
         function enterApp() {
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('main-app').classList.remove('hidden');
-            
-            // Pokaż przycisk admina jeśli admin
-            if (isAdmin) {
-                document.getElementById('admin-btn').classList.remove('hidden');
-            }
-            
-            // Aktualizuj badge użytkownika
             document.getElementById('user-badge').textContent = isAdmin ? '🛡️ Admin' : '👤 ' + currentUser.name;
             
-            // Załaduj dane
+            if (isAdmin) {
+                document.getElementById('admin-btn').classList.remove('hidden');
+                document.getElementById('add-info-text').textContent = 'Jako admin dodajesz serwer od razu (zweryfikowany)';
+            }
+            
             loadChat();
             loadServers();
-            showTab('chat');
+            switchTab('chat');
         }
-
+        
         function logout() {
             currentUser = null;
             isAdmin = false;
@@ -402,87 +346,91 @@
             document.getElementById('auth-screen').classList.remove('hidden');
             document.getElementById('main-app').classList.add('hidden');
             document.getElementById('admin-code-input').value = '';
-            showToast('Wylogowano', 'info');
         }
-
-        // Enter na klawiaturze w polu kodu
-        document.getElementById('admin-code-input')?.addEventListener('keypress', (e) => {
+        
+        // Enter w polu kodu
+        document.getElementById('admin-code-input').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') loginAsAdmin();
         });
-
-        // --- TOAST ---
-        function showToast(message, type = 'info') {
+        
+        // ============ NOTYFIKACJE ============
+        function showNotification(message, type) {
             const colors = {
-                success: 'bg-discord-green',
-                error: 'bg-discord-red',
-                warning: 'bg-discord-yellow text-black',
-                info: 'bg-discord-blurple'
+                success: '#23A55A',
+                error: '#ED4245',
+                info: '#5865F2'
             };
             
-            const toast = document.createElement('div');
-            toast.className = `fixed bottom-6 left-1/2 -translate-x-1/2 z-[2000] px-6 py-3 rounded-xl text-sm font-medium shadow-2xl ${colors[type]} text-white animate-slide-up`;
-            toast.textContent = message;
-            document.body.appendChild(toast);
+            const notif = document.createElement('div');
+            notif.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: ${colors[type] || '#5865F2'};
+                color: white;
+                padding: 12px 24px;
+                border-radius: 12px;
+                font-size: 14px;
+                font-weight: 500;
+                z-index: 9999;
+                box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+                animation: slideUp 0.3s ease-out;
+            `;
+            notif.textContent = message;
+            document.body.appendChild(notif);
             
             setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transition = 'opacity 0.3s';
-                setTimeout(() => toast.remove(), 300);
+                notif.style.opacity = '0';
+                notif.style.transition = 'opacity 0.3s';
+                setTimeout(() => notif.remove(), 300);
             }, 3000);
         }
-
-        // --- NAWIGACJA ---
-        function showTab(tabName) {
+        
+        // ============ NAWIGACJA ============
+        function switchTab(tab) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            const tabElement = document.getElementById('tab-' + tabName);
-            if (tabElement) tabElement.classList.remove('hidden');
+            const tabEl = document.getElementById('tab-' + tab);
+            if (tabEl) tabEl.classList.remove('hidden');
             
             const titles = {
-                'chat': '💬 Czat ogólny',
-                'discover': '🧭 Przeglądaj serwery',
-                'apply': '➕ Dodaj serwer',
-                'admin': '🛡️ Panel admina'
+                'chat': '💬 CZAT OGÓLNY',
+                'discover': '🧭 PRZEGLĄDAJ SERWERY',
+                'add': '➕ DODAJ SERWER',
+                'admin': '🛡️ PANEL ADMINA'
             };
-            document.getElementById('header-text').textContent = titles[tabName] || tabName.toUpperCase();
+            document.getElementById('header-title').textContent = titles[tab] || tab.toUpperCase();
             
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('bg-discord-blurple/30', 'text-white'));
-            const activeNav = document.getElementById('nav-' + tabName);
-            if (activeNav) activeNav.classList.add('bg-discord-blurple/30', 'text-white');
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-[#5865F2]/30', 'text-white');
+            });
+            const navBtn = document.getElementById('nav-' + tab);
+            if (navBtn) navBtn.classList.add('bg-[#5865F2]/30', 'text-white');
             
-            if (tabName === 'admin') loadAdminRequests();
-            if (tabName === 'discover') filterServers();
-            
-            if (tabName === 'chat') {
-                setTimeout(() => {
-                    const chatBox = document.getElementById('chat-box');
-                    if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
-                }, 100);
-            }
+            if (tab === 'admin') loadAdminPanel();
+            if (tab === 'discover') renderServers(allServers);
         }
-
-        // --- CZAT ---
+        
+        // ============ CZAT ============
         function loadChat() {
-            db.ref('messages').limitToLast(50).on('value', snap => {
-                const box = document.getElementById('chat-box');
-                if (!box) return;
-                
+            db.ref('messages').limitToLast(50).on('value', function(snapshot) {
+                const box = document.getElementById('chat-messages');
                 box.innerHTML = '';
-                const messages = [];
-                snap.forEach(child => messages.push(child.val()));
                 
-                messages.forEach(m => {
+                snapshot.forEach(function(child) {
+                    const msg = child.val();
                     const div = document.createElement('div');
-                    div.className = 'flex items-start gap-3 px-2 py-1 rounded-lg hover:bg-discord-hover/50 transition-colors animate-fade-in';
+                    div.className = 'flex items-start gap-3 px-2 py-1 rounded-lg hover:bg-[#35373C]/50 transition-colors animate-fadeIn';
                     div.innerHTML = `
-                        <div class="w-8 h-8 rounded-full bg-discord-blurple/30 flex items-center justify-center text-xs font-bold text-discord-blurple shrink-0">
-                            ${(m.user || '?').charAt(0).toUpperCase()}
+                        <div class="w-8 h-8 rounded-full bg-[#5865F2]/30 flex items-center justify-center text-xs font-bold text-[#5865F2] shrink-0">
+                            ${(msg.user || '?').charAt(0).toUpperCase()}
                         </div>
                         <div>
                             <div class="flex items-center gap-2">
-                                <span class="font-semibold text-sm text-white">${escapeHtml(m.user || 'Anonim')}</span>
-                                <span class="text-[10px] text-discord-muted">${m.timestamp ? new Date(m.timestamp).toLocaleTimeString('pl-PL', {hour: '2-digit', minute:'2-digit'}) : ''}</span>
+                                <span class="font-semibold text-sm text-white">${escapeHtml(msg.user || 'Anonim')}</span>
+                                <span class="text-[10px] text-[#949BA4]">${msg.time || ''}</span>
                             </div>
-                            <p class="text-sm text-discord-text">${escapeHtml(m.text)}</p>
+                            <p class="text-sm text-[#DBDEE1]">${escapeHtml(msg.text)}</p>
                         </div>
                     `;
                     box.appendChild(div);
@@ -491,213 +439,304 @@
                 box.scrollTop = box.scrollHeight;
             });
         }
-
-        function sendChatMessage() {
-            const input = document.getElementById('chat-in');
+        
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
             const text = input.value.trim();
             if (!text || !currentUser) return;
+            
+            const now = new Date();
+            const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
             
             db.ref('messages').push({
                 user: currentUser.name,
                 text: text,
+                time: time,
                 timestamp: firebase.database.ServerValue.TIMESTAMP
             });
             
             input.value = '';
             input.focus();
         }
-
-        document.getElementById('chat-in')?.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendChatMessage();
+        
+        document.getElementById('chat-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendMessage();
         });
-
-        // --- SERWERY ---
+        
+        // ============ SERWERY ============
         function loadServers() {
-            db.ref('approved_servers').on('value', snap => {
+            db.ref('servers').on('value', function(snapshot) {
                 allServers = [];
-                snap.forEach(child => {
-                    allServers.push({ id: child.key, ...child.val() });
+                snapshot.forEach(function(child) {
+                    allServers.push({
+                        id: child.key,
+                        ...child.val()
+                    });
                 });
-                updateServerCounts();
-                filterServers();
+                
+                document.getElementById('total-servers').textContent = allServers.length;
+                document.getElementById('filtered-servers').textContent = allServers.length;
+                
+                if (document.getElementById('tab-discover').classList.contains('hidden') === false) {
+                    renderServers(allServers);
+                }
             });
         }
-
+        
         function filterServers() {
-            const searchTerm = document.getElementById('search-input')?.value.toLowerCase() || '';
+            const query = document.getElementById('search-input').value.toLowerCase().trim();
+            
+            let filtered = allServers;
+            if (query) {
+                filtered = allServers.filter(s => 
+                    (s.name && s.name.toLowerCase().includes(query)) ||
+                    (s.code && s.code.toLowerCase().includes(query)) ||
+                    (s.desc && s.desc.toLowerCase().includes(query))
+                );
+            }
+            
+            document.getElementById('filtered-servers').textContent = filtered.length;
+            renderServers(filtered);
+        }
+        
+        function renderServers(servers) {
             const grid = document.getElementById('servers-grid');
-            const noMessage = document.getElementById('no-servers-message');
+            const noServers = document.getElementById('no-servers');
             
             if (!grid) return;
             
-            const filtered = allServers.filter(server => 
-                server.name?.toLowerCase().includes(searchTerm) ||
-                server.code?.toLowerCase().includes(searchTerm) ||
-                server.desc?.toLowerCase().includes(searchTerm)
-            );
-            
-            document.getElementById('filtered-count').textContent = filtered.length;
-            
-            if (filtered.length === 0) {
+            if (servers.length === 0) {
                 grid.innerHTML = '';
-                noMessage?.classList.remove('hidden');
-            } else {
-                noMessage?.classList.add('hidden');
-                grid.innerHTML = filtered.map(server => createServerCard(server)).join('');
-            }
-            
-            setTimeout(() => lucide.createIcons(), 50);
-        }
-
-        function createServerCard(server) {
-            const gradients = ['from-discord-blurple to-blue-600', 'from-discord-green to-emerald-600', 'from-purple-600 to-pink-600', 'from-orange-500 to-red-600'];
-            const gradient = gradients[Math.floor(Math.random() * gradients.length)];
-            
-            return `
-                <div class="server-card bg-discord-dark rounded-xl border border-discord-border overflow-hidden hover:border-discord-blurple/50 transition-all">
-                    <div class="h-24 bg-gradient-to-br ${gradient} relative flex items-center justify-center">
-                        <span class="text-4xl font-black text-white/20">${(server.name || '?').charAt(0)}</span>
-                    </div>
-                    <div class="p-4">
-                        <div class="flex items-start justify-between mb-2">
-                            <h3 class="font-bold text-white text-sm truncate">${escapeHtml(server.name || 'Bez nazwy')}</h3>
-                            ${server.code ? `<span class="text-[10px] bg-discord-darker px-2 py-0.5 rounded-full text-discord-muted font-mono">${escapeHtml(server.code)}</span>` : ''}
-                        </div>
-                        <p class="text-xs text-discord-muted line-clamp-3 mb-3">${escapeHtml(server.desc || 'Brak opisu')}</p>
-                        <div class="flex items-center gap-1.5">
-                            <span class="w-2 h-2 bg-discord-green rounded-full online-dot"></span>
-                            <span class="text-[10px] text-discord-muted">Online</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function updateServerCounts() {
-            document.getElementById('servers-count').textContent = allServers.length;
-            document.getElementById('filtered-count').textContent = allServers.length;
-        }
-
-        // --- DODAWANIE SERWERA ---
-        function sendSrv() {
-            if (!currentUser) return;
-            
-            const name = document.getElementById('s-name').value.trim();
-            const code = document.getElementById('s-code').value.trim();
-            const desc = document.getElementById('s-desc').value.trim();
-            
-            if (!name) {
-                showToast('Podaj nazwę serwera!', 'warning');
+                noServers.classList.remove('hidden');
                 return;
             }
             
-            // Admin dodaje od razu do approved_servers
+            noServers.classList.add('hidden');
+            
+            grid.innerHTML = servers.map(function(server) {
+                const gradient = ['#5865F2', '#23A55A', '#ED4245', '#FEE75C', '#EB459E'][Math.floor(Math.random() * 5)];
+                const verifiedBadge = server.verified ? `
+                    <span class="verified-badge text-white text-[10px] px-2 py-0.5 rounded-full font-bold flex items-center gap-1" title="Zweryfikowany serwer">
+                        ✓ Zweryfikowany
+                    </span>
+                ` : '';
+                
+                return `
+                    <div class="server-card bg-[#2B2D31] rounded-xl border border-[#3F4147] overflow-hidden">
+                        <div class="h-20 flex items-center justify-center relative" style="background: linear-gradient(135deg, ${gradient}33, ${gradient}66);">
+                            <span class="text-3xl font-black opacity-20">${(server.name || '?').charAt(0).toUpperCase()}</span>
+                            ${server.verified ? '<span class="absolute top-2 right-2 text-[#5865F2]">✓</span>' : ''}
+                        </div>
+                        <div class="p-4">
+                            <div class="flex items-start justify-between mb-2">
+                                <h3 class="font-bold text-white text-sm">${escapeHtml(server.name || 'Bez nazwy')}</h3>
+                                ${server.code ? `<span class="text-[10px] bg-[#1E1F22] px-2 py-0.5 rounded text-[#949BA4] font-mono">${escapeHtml(server.code)}</span>` : ''}
+                            </div>
+                            ${verifiedBadge}
+                            <p class="text-xs text-[#949BA4] mt-2 line-clamp-3">${escapeHtml(server.desc || 'Brak opisu')}</p>
+                            <div class="flex items-center justify-between mt-3 pt-3 border-t border-[#3F4147]">
+                                <span class="text-[10px] text-[#949BA4]">Dodane przez: ${escapeHtml(server.addedBy || 'Nieznany')}</span>
+                                <span class="w-2 h-2 bg-[#23A55A] rounded-full"></span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            lucide.createIcons();
+        }
+        
+        // ============ DODAWANIE SERWERA ============
+        function addServer() {
+            const name = document.getElementById('server-name').value.trim();
+            const code = document.getElementById('server-code').value.trim();
+            const desc = document.getElementById('server-desc').value.trim();
+            
+            if (!name) {
+                showNotification('⚠️ Podaj nazwę serwera!', 'error');
+                return;
+            }
+            
+            if (!currentUser) {
+                showNotification('⚠️ Nie jesteś zalogowany!', 'error');
+                return;
+            }
+            
+            const serverData = {
+                name: name,
+                code: code,
+                desc: desc,
+                addedBy: currentUser.name,
+                verified: isAdmin ? true : false,  // Admin dodaje od razu zweryfikowany
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            };
+            
             if (isAdmin) {
-                db.ref('approved_servers').push({
-                    user: currentUser.name,
-                    name: name,
-                    code: code,
-                    desc: desc,
-                    timestamp: firebase.database.ServerValue.TIMESTAMP
-                }).then(() => {
-                    showToast('Serwer dodany pomyślnie! ✅', 'success');
-                    clearServerForm();
-                });
+                // Admin dodaje bezpośrednio do serwerów
+                db.ref('servers').push(serverData)
+                    .then(function() {
+                        showNotification('✅ Serwer dodany i zweryfikowany!', 'success');
+                        clearAddForm();
+                        switchTab('discover');
+                    })
+                    .catch(function(error) {
+                        showNotification('❌ Błąd: ' + error.message, 'error');
+                    });
             } else {
-                // Gość wysyła do requests
-                db.ref('requests').push({
-                    user: currentUser.name,
-                    name: name,
-                    code: code,
-                    desc: desc,
-                    timestamp: firebase.database.ServerValue.TIMESTAMP
-                }).then(() => {
-                    showToast('Zgłoszenie wysłane do admina! ✅', 'success');
-                    clearServerForm();
-                });
+                // Gość wysyła zgłoszenie
+                db.ref('requests').push(serverData)
+                    .then(function() {
+                        showNotification('✅ Zgłoszenie wysłane do admina!', 'success');
+                        clearAddForm();
+                    })
+                    .catch(function(error) {
+                        showNotification('❌ Błąd: ' + error.message, 'error');
+                    });
             }
         }
-
-        function clearServerForm() {
-            document.getElementById('s-name').value = '';
-            document.getElementById('s-code').value = '';
-            document.getElementById('s-desc').value = '';
+        
+        function clearAddForm() {
+            document.getElementById('server-name').value = '';
+            document.getElementById('server-code').value = '';
+            document.getElementById('server-desc').value = '';
         }
-
-        // --- PANEL ADMINA ---
-        function loadAdminRequests() {
+        
+        // ============ PANEL ADMINA ============
+        function loadAdminPanel() {
             if (!isAdmin) return;
             
-            db.ref('requests').on('value', snap => {
-                const box = document.getElementById('admin-list');
-                const noMessage = document.getElementById('no-requests-message');
+            // Załaduj zgłoszenia
+            db.ref('requests').on('value', function(snapshot) {
+                const container = document.getElementById('admin-requests');
+                const noRequests = document.getElementById('no-requests');
+                container.innerHTML = '';
                 
-                if (!box) return;
-                
-                box.innerHTML = '';
                 let hasRequests = false;
                 
-                snap.forEach(child => {
+                snapshot.forEach(function(child) {
                     hasRequests = true;
-                    const r = child.val();
+                    const req = child.val();
                     const div = document.createElement('div');
-                    div.className = 'bg-discord-dark p-4 rounded-xl border border-discord-border hover:border-discord-red/30 transition-all';
+                    div.className = 'bg-[#2B2D31] p-4 rounded-xl border border-[#3F4147]';
                     div.innerHTML = `
                         <div class="flex items-start justify-between">
-                            <div>
-                                <h3 class="font-bold text-white">${escapeHtml(r.name)}</h3>
-                                <p class="text-xs text-discord-muted mt-1">Kod: ${escapeHtml(r.code || 'brak')}</p>
-                                <p class="text-xs text-discord-muted mt-1">Od: ${escapeHtml(r.user)}</p>
-                                <p class="text-sm text-discord-text mt-2">${escapeHtml(r.desc || 'Brak opisu')}</p>
+                            <div class="flex-1">
+                                <h4 class="font-bold text-white">${escapeHtml(req.name)}</h4>
+                                <p class="text-xs text-[#949BA4] mt-1">Kod: ${escapeHtml(req.code || 'brak')} | Od: ${escapeHtml(req.addedBy)}</p>
+                                <p class="text-sm text-[#DBDEE1] mt-2">${escapeHtml(req.desc || 'Brak opisu')}</p>
                             </div>
-                            <div class="flex gap-2">
-                                <button onclick="approveServer('${child.key}')" class="bg-discord-green/20 text-discord-green px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-discord-green/30 transition-all">
-                                    <i data-lucide="check" class="w-3 h-3 inline mr-1"></i>Zatwierdź
+                            <div class="flex gap-2 ml-4">
+                                <button onclick="approveRequest('${child.key}')" 
+                                        class="bg-[#23A55A]/20 text-[#23A55A] px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-[#23A55A]/30 transition-all whitespace-nowrap">
+                                    ✅ Zatwierdź
                                 </button>
-                                <button onclick="deleteRequest('${child.key}')" class="bg-discord-red/20 text-discord-red px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-discord-red/30 transition-all">
-                                    <i data-lucide="trash-2" class="w-3 h-3 inline mr-1"></i>Usuń
+                                <button onclick="rejectRequest('${child.key}')" 
+                                        class="bg-[#ED4245]/20 text-[#ED4245] px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-[#ED4245]/30 transition-all whitespace-nowrap">
+                                    ❌ Odrzuć
                                 </button>
                             </div>
                         </div>
                     `;
-                    box.appendChild(div);
+                    container.appendChild(div);
                 });
                 
                 if (hasRequests) {
-                    noMessage?.classList.add('hidden');
+                    noRequests.classList.add('hidden');
                 } else {
-                    noMessage?.classList.remove('hidden');
+                    noRequests.classList.remove('hidden');
                 }
+            });
+            
+            // Załaduj wszystkie serwery (do zarządzania weryfikacją)
+            db.ref('servers').on('value', function(snapshot) {
+                const container = document.getElementById('admin-all-servers');
+                container.innerHTML = '';
                 
-                setTimeout(() => lucide.createIcons(), 50);
+                snapshot.forEach(function(child) {
+                    const server = child.val();
+                    const div = document.createElement('div');
+                    div.className = 'bg-[#2B2D31] p-4 rounded-xl border border-[#3F4147] flex items-center justify-between';
+                    div.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-[#5865F2]/20 flex items-center justify-center font-bold text-[#5865F2]">
+                                ${(server.name || '?').charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                                <span class="font-bold text-white">${escapeHtml(server.name)}</span>
+                                <span class="text-xs text-[#949BA4] ml-2">${escapeHtml(server.code || '')}</span>
+                                ${server.verified ? '<span class="text-[#5865F2] text-xs ml-2">✓ Zweryfikowany</span>' : '<span class="text-[#949BA4] text-xs ml-2">Niezweryfikowany</span>'}
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            ${!server.verified ? `
+                                <button onclick="verifyServer('${child.key}')" 
+                                        class="bg-[#5865F2]/20 text-[#5865F2] px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-[#5865F2]/30 transition-all">
+                                    ✓ Zweryfikuj
+                                </button>
+                            ` : `
+                                <button onclick="unverifyServer('${child.key}')" 
+                                        class="bg-[#FEE75C]/20 text-[#FEE75C] px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-[#FEE75C]/30 transition-all">
+                                    ✕ Cofnij weryfikację
+                                </button>
+                            `}
+                            <button onclick="deleteServer('${child.key}')" 
+                                    class="bg-[#ED4245]/20 text-[#ED4245] px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-[#ED4245]/30 transition-all">
+                                🗑 Usuń
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+                
+                lucide.createIcons();
             });
         }
-
-        function approveServer(requestId) {
-            db.ref('requests/' + requestId).once('value').then(snap => {
-                const data = snap.val();
-                db.ref('approved_servers').push(data).then(() => {
+        
+        function approveRequest(requestId) {
+            db.ref('requests/' + requestId).once('value').then(function(snapshot) {
+                const data = snapshot.val();
+                data.verified = false; // Zgłoszenia nie są automatycznie weryfikowane
+                
+                db.ref('servers').push(data).then(function() {
                     db.ref('requests/' + requestId).remove();
-                    showToast('Serwer zatwierdzony! ✅', 'success');
+                    showNotification('✅ Serwer zatwierdzony!', 'success');
                 });
             });
         }
-
-        function deleteRequest(requestId) {
-            if (confirm('Usunąć to zgłoszenie?')) {
+        
+        function rejectRequest(requestId) {
+            if (confirm('Odrzucić to zgłoszenie? Zostanie usunięte.')) {
                 db.ref('requests/' + requestId).remove();
-                showToast('Zgłoszenie usunięte', 'info');
+                showNotification('🗑 Zgłoszenie odrzucone', 'info');
             }
         }
-
-        // --- POMOCNICZE ---
+        
+        function verifyServer(serverId) {
+            db.ref('servers/' + serverId + '/verified').set(true);
+            showNotification('✓ Serwer zweryfikowany! (niebieski ptaszek)', 'success');
+        }
+        
+        function unverifyServer(serverId) {
+            db.ref('servers/' + serverId + '/verified').set(false);
+            showNotification('Weryfikacja cofnięta', 'info');
+        }
+        
+        function deleteServer(serverId) {
+            if (confirm('Na pewno chcesz USUNĄĆ ten serwer? Tej operacji nie można cofnąć!')) {
+                db.ref('servers/' + serverId).remove();
+                showNotification('🗑 Serwer usunięty', 'info');
+            }
+        }
+        
+        // ============ POMOCNICZE ============
         function escapeHtml(text) {
+            if (!text) return '';
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
-
-        // --- INICJALIZACJA ---
+        
+        // ============ INICJALIZACJA ============
         lucide.createIcons();
     </script>
 </body>
