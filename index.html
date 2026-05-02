@@ -9,65 +9,128 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #313338; color: #DBDEE1; }
+        .message-anim { animation: fadeIn 0.2s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #2b2d31; }
+        ::-webkit-scrollbar-thumb { background: #1e1f22; border-radius: 4px; }
     </style>
 </head>
 <body class="h-screen overflow-hidden flex flex-col">
 
-    <!-- Pasek boczny i główny kontener -->
+    <!-- Modal Ustawiania Nicku -->
+    <div id="nick-modal" class="fixed inset-0 bg-black/80 z-[200] flex items-center justify-center p-4">
+        <div class="bg-[#313338] p-8 rounded-xl border border-[#3F4147] max-w-sm w-full shadow-2xl">
+            <h2 class="text-2xl font-bold text-white mb-2 text-center">Witaj Gościu!</h2>
+            <p class="text-sm text-[#B5BAC1] mb-6 text-center">Podaj swój nick z Roblox lub Discord, aby pisać na czacie.</p>
+            <input type="text" id="user-nick-input" class="w-full bg-[#1E1F22] border-none rounded p-3 text-white mb-4 outline-none focus:ring-2 ring-[#5865F2]" placeholder="Twój Nick...">
+            <button onclick="saveNick()" class="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white py-3 rounded font-bold transition-all">Zacznij pisać</button>
+        </div>
+    </div>
+
     <div class="flex flex-1 overflow-hidden">
-        <!-- Sidebar -->
+        <!-- Sidebar Ikony -->
         <nav class="w-[72px] bg-[#1E1F22] flex flex-col items-center py-3 space-y-4 shrink-0">
-            <div class="w-12 h-12 bg-[#5865F2] rounded-[16px] flex items-center justify-center text-white cursor-pointer">
+            <div onclick="showTab('chat')" class="w-12 h-12 bg-[#5865F2] rounded-[16px] flex items-center justify-center text-white cursor-pointer hover:rounded-[12px] transition-all" title="Czat">
                 <i data-lucide="message-square"></i>
             </div>
-            <div id="admin-icon" class="hidden w-12 h-12 bg-[#ED4245] rounded-[24px] flex items-center justify-center text-white cursor-pointer hover:rounded-[16px] transition-all">
+            <div onclick="showTab('apply')" class="w-12 h-12 bg-[#3BA55C] rounded-[24px] flex items-center justify-center text-white cursor-pointer hover:rounded-[16px] hover:bg-[#2D7D46] transition-all" title="Dodaj Serwer">
+                <i data-lucide="plus-circle"></i>
+            </div>
+            <div onclick="showTab('faq')" class="w-12 h-12 bg-[#4E5058] rounded-[24px] flex items-center justify-center text-white cursor-pointer hover:rounded-[16px] transition-all" title="Pomoc">
+                <i data-lucide="help-circle"></i>
+            </div>
+            <div id="admin-icon" class="hidden w-12 h-12 bg-[#ED4245] rounded-[24px] flex items-center justify-center text-white cursor-pointer hover:rounded-[16px] transition-all" title="Admin">
                 <i data-lucide="shield-alert"></i>
             </div>
         </nav>
 
-        <!-- Główna zawartość -->
-        <main class="flex-1 flex flex-col">
-            <header class="h-12 border-b border-[#1F2124] flex items-center px-4 justify-between bg-[#313338]">
-                <div class="flex items-center font-bold text-white">
-                    <i data-lucide="hash" class="text-[#80848E] mr-2"></i> ogólny
+        <!-- Sidebar Kanały (Tylko w widoku czatu) -->
+        <aside id="channels-sidebar" class="w-60 bg-[#2B2D31] flex flex-col shrink-0 hidden md:flex">
+            <div class="h-12 border-b border-[#1F2124] flex items-center px-4 font-bold text-white shadow-sm">
+                PORTAL SERWERÓW
+            </div>
+            <div class="p-3 space-y-1">
+                <div class="text-[11px] font-bold uppercase text-[#949BA4] px-2 mb-2">Kanały tekstowe</div>
+                <button onclick="changeChannel('ogólny')" class="w-full flex items-center px-2 py-1.5 rounded text-[#DBDEE1] bg-[#3F4147] hover:bg-[#35373C] transition-all">
+                    <i data-lucide="hash" class="w-4 h-4 mr-2 text-[#80848E]"></i> ogólny
+                </button>
+                <button onclick="changeChannel('szukam-ekipy')" class="w-full flex items-center px-2 py-1.5 rounded text-[#949BA4] hover:bg-[#35373C] hover:text-[#DBDEE1] transition-all">
+                    <i data-lucide="hash" class="w-4 h-4 mr-2 text-[#80848E]"></i> szukam-ekipy
+                </button>
+                <button onclick="changeChannel('pytania')" class="w-full flex items-center px-2 py-1.5 rounded text-[#949BA4] hover:bg-[#35373C] hover:text-[#DBDEE1] transition-all">
+                    <i data-lucide="hash" class="w-4 h-4 mr-2 text-[#80848E]"></i> pytania
+                </button>
+            </div>
+            <!-- Profil na dole -->
+            <div class="mt-auto bg-[#232428] p-2 flex items-center gap-2">
+                <div class="w-8 h-8 bg-[#5865F2] rounded-full flex items-center justify-center font-bold text-white text-xs" id="user-avatar">?</div>
+                <div class="flex-1 overflow-hidden">
+                    <div class="text-xs font-bold text-white truncate" id="user-display-name">Gość</div>
+                    <div class="text-[10px] text-[#B5BAC1]">Status: Online</div>
                 </div>
-                <button id="login-btn" class="bg-[#248046] hover:bg-[#1a6334] text-white px-3 py-1 rounded text-sm font-medium transition-colors">
-                    Zaloguj jako Admin
+                <i data-lucide="settings" class="w-4 h-4 text-[#B5BAC1] cursor-pointer hover:text-white" onclick="document.getElementById('nick-modal').classList.remove('hidden')"></i>
+            </div>
+        </aside>
+
+        <!-- Obszar Główny -->
+        <main class="flex-1 flex flex-col bg-[#313338]">
+            <header class="h-12 border-b border-[#1F2124] flex items-center px-4 justify-between bg-[#313338] z-10">
+                <div class="flex items-center font-bold text-white uppercase text-xs tracking-widest" id="header-title">
+                    <i data-lucide="hash" class="text-[#80848E] mr-2"></i> czat-ogólny
+                </div>
+                <button id="login-btn" class="bg-[#248046] hover:bg-[#1a6334] text-white px-3 py-1 rounded text-[11px] font-bold uppercase transition-colors">
+                    Login Admin
                 </button>
             </header>
 
-            <!-- Czat -->
-            <div class="flex-1 p-4 overflow-y-auto space-y-4" id="chat-box">
-                <div class="flex gap-3">
-                    <div class="w-10 h-10 bg-gray-500 rounded-full flex items-center justify-center font-bold text-white">S</div>
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <span class="font-bold text-white text-sm">System</span>
-                            <span class="text-[10px] text-[#949BA4]">Dzisiaj o 12:00</span>
-                        </div>
-                        <p class="text-sm">Witaj na portalu Emergency Hamburg! Aby zarządzać stroną, kliknij przycisk logowania.</p>
+            <!-- Widok: CZAT -->
+            <div id="tab-chat" class="tab-content flex-1 flex flex-col overflow-hidden">
+                <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-4 flex flex-col">
+                    <!-- Wiadomości będą tu wpadać -->
+                </div>
+                <!-- Input Czatu -->
+                <div class="p-4 bg-[#313338]">
+                    <div class="bg-[#383A40] rounded-lg p-3 flex items-center gap-3">
+                        <input type="text" id="chat-input" class="bg-transparent border-none outline-none flex-1 text-sm text-[#DBDEE1]" placeholder="Napisz na tym kanale...">
+                        <button onclick="sendMessage()" class="text-[#B5BAC1] hover:text-white transition-colors">
+                            <i data-lucide="send" class="w-5 h-5"></i>
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Panel Admina (Ukryty) -->
-            <div id="admin-panel" class="hidden fixed inset-0 bg-[#313338] z-50 p-8">
-                <div class="max-w-2xl mx-auto">
-                    <div class="flex justify-between items-center mb-8">
-                        <h1 class="text-2xl font-bold text-white flex items-center gap-2">
-                            <i data-lucide="shield-check" class="text-[#ED4245]"></i> Panel Administracyjny
-                        </h1>
-                        <button id="close-admin" class="text-[#949BA4] hover:text-white"><i data-lucide="x"></i></button>
+            <!-- Inne zakładki (Zgłoszenia, FAQ) zostają tak jak wcześniej -->
+            <div id="tab-apply" class="tab-content hidden flex-1 p-6 overflow-y-auto">
+                <!-- Treść zgłoszeń -->
+                <div class="max-w-xl mx-auto bg-[#2B2D31] p-8 rounded-xl border border-[#3F4147] shadow-2xl">
+                    <h2 class="text-2xl font-bold text-white mb-6 uppercase tracking-tighter">Zgłoś swój Serwer</h2>
+                    <input type="text" class="w-full bg-[#1E1F22] rounded p-3 mb-4 outline-none" placeholder="Nazwa Serwera">
+                    <input type="text" class="w-full bg-[#1E1F22] rounded p-3 mb-4 outline-none" placeholder="Kod EH">
+                    <textarea class="w-full bg-[#1E1F22] rounded p-3 mb-4 outline-none h-32" placeholder="Opis..."></textarea>
+                    <button onclick="alert('Wysłano!')" class="w-full bg-[#3BA55C] py-3 rounded font-bold">Wyślij do weryfikacji</button>
+                </div>
+            </div>
+
+            <div id="tab-faq" class="tab-content hidden flex-1 p-8 overflow-y-auto">
+                <h2 class="text-3xl font-bold text-white mb-8">FAQ - Pomoc</h2>
+                <div class="space-y-4">
+                    <div class="bg-[#2B2D31] p-4 rounded border-l-4 border-[#5865F2]">
+                        <h4 class="font-bold text-white">Jak dodać serwer?</h4>
+                        <p class="text-sm">Użyj zakładki plusa, wypełnij dane i czekaj na akceptację admina.</p>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="bg-[#2B2D31] p-6 rounded-lg border border-[#3F4147]">
-                            <h3 class="font-bold mb-2">Zarządzanie czatem</h3>
-                            <button class="w-full bg-[#ED4245] py-2 rounded font-bold text-sm">Wyczyść wiadomości</button>
-                        </div>
-                        <div class="bg-[#2B2D31] p-6 rounded-lg border border-[#3F4147]">
-                            <h3 class="font-bold mb-2">Serwery</h3>
-                            <button class="w-full bg-[#5865F2] py-2 rounded font-bold text-sm">Dodaj nowy serwer</button>
-                        </div>
+                </div>
+            </div>
+            
+            <!-- Panel Admina -->
+            <div id="admin-panel" class="hidden fixed inset-0 bg-[#313338] z-[300] p-8 overflow-y-auto">
+                <div class="max-w-4xl mx-auto">
+                    <div class="flex justify-between items-center mb-8 text-white">
+                        <h1 class="text-2xl font-bold">PANEL ADMINA</h1>
+                        <button onclick="document.getElementById('admin-panel').classList.add('hidden')" class="bg-red-500 px-4 py-2 rounded">ZAMKNIJ</button>
+                    </div>
+                    <div class="bg-[#2B2D31] p-6 rounded-xl text-white">
+                        Tu będą pojawiać się zgłoszenia serwerów do akceptacji.
                     </div>
                 </div>
             </div>
@@ -75,28 +138,93 @@
     </div>
 
     <script>
-        // LOGIKA DOSTĘPU
-        const ADMIN_CODE = "EH2026"; // TWOJE HASŁO DO PANELU
+        const ADMIN_CODE = "EH2026";
+        let currentUserNick = "Gość";
 
-        const loginBtn = document.getElementById('login-btn');
-        const adminIcon = document.getElementById('admin-icon');
-        const adminPanel = document.getElementById('admin-panel');
-        const closeAdmin = document.getElementById('close-admin');
+        // Zapisywanie nicku
+        function saveNick() {
+            const input = document.getElementById('user-nick-input');
+            if(input.value.trim().length < 3) {
+                alert("Nick musi mieć min. 3 znaki!");
+                return;
+            }
+            currentUserNick = input.value.trim();
+            document.getElementById('user-display-name').innerText = currentUserNick;
+            document.getElementById('user-avatar').innerText = currentUserNick[0].toUpperCase();
+            document.getElementById('nick-modal').classList.add('hidden');
+            
+            addSystemMessage(`Witaj **${currentUserNick}** na czacie! Pamiętaj o zachowaniu kultury.`);
+        }
 
-        loginBtn.onclick = () => {
-            const pass = prompt("Podaj kod administratora:");
-            if (pass === ADMIN_CODE) {
-                alert("Zalogowano pomyślnie!");
-                adminIcon.classList.remove('hidden');
-                loginBtn.innerText = "Zalogowano: Admin";
-                loginBtn.classList.replace('bg-[#248046]', 'bg-[#5865F2]');
-            } else {
-                alert("Błędny kod!");
+        // Wysyłanie wiadomości
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            if(!input.value.trim()) return;
+
+            const chatBox = document.getElementById('chat-messages');
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            const msgHtml = `
+                <div class="flex gap-4 message-anim">
+                    <div class="w-10 h-10 bg-[#4E5058] rounded-full flex items-center justify-center font-bold text-white shrink-0">${currentUserNick[0].toUpperCase()}</div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-white text-sm hover:underline cursor-pointer">${currentUserNick}</span>
+                            <span class="text-[10px] text-[#949BA4]">${time}</span>
+                        </div>
+                        <p class="text-sm text-[#DBDEE1]">${input.value}</p>
+                    </div>
+                </div>
+            `;
+            
+            chatBox.innerHTML += msgHtml;
+            input.value = "";
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function addSystemMessage(text) {
+            const chatBox = document.getElementById('chat-messages');
+            chatBox.innerHTML += `
+                <div class="flex gap-4 text-[#B5BAC1] text-xs italic p-2 bg-[#2e3035] rounded">
+                    <span>[SYSTEM]: ${text}</span>
+                </div>
+            `;
+        }
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+            document.getElementById('tab-' + tabName).classList.remove('hidden');
+            
+            // Ukryj/Pokaż sidebar kanałów tylko dla czatu
+            const sidebar = document.getElementById('channels-sidebar');
+            tabName === 'chat' ? sidebar.classList.remove('hidden') : sidebar.classList.add('hidden');
+            
+            lucide.createIcons();
+        }
+
+        function changeChannel(name) {
+            document.getElementById('header-title').innerHTML = `<i data-lucide="hash" class="text-[#80848E] mr-2"></i> ${name}`;
+            document.getElementById('chat-messages').innerHTML = ""; // Czyści czat przy zmianie kanału
+            addSystemMessage(`Dołączyłeś do kanału #${name}`);
+            lucide.createIcons();
+        }
+
+        // Admin Logic
+        document.getElementById('login-btn').onclick = () => {
+            if(prompt("Kod Admina:") === ADMIN_CODE) {
+                document.getElementById('admin-icon').classList.remove('hidden');
+                alert("Zalogowano jako Administrator!");
             }
         };
 
-        adminIcon.onclick = () => adminPanel.classList.remove('hidden');
-        closeAdmin.onclick = () => adminPanel.classList.add('hidden');
+        document.getElementById('admin-icon').onclick = () => {
+            document.getElementById('admin-panel').classList.remove('hidden');
+        };
+
+        // Obsługa klawisza Enter
+        document.getElementById('chat-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') sendMessage();
+        });
 
         lucide.createIcons();
     </script>
