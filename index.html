@@ -2,81 +2,372 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EH Portal - Serwery RP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EH Portal • Serwery RP</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        discord: {
+                            bg: '#313338',
+                            sidebar: '#1E1F22',
+                            dark: '#2B2D31',
+                            darker: '#1E1F22',
+                            hover: '#35373C',
+                            text: '#DBDEE1',
+                            muted: '#949BA4',
+                            blurple: '#5865F2',
+                            green: '#23A55A',
+                            red: '#ED4245',
+                            yellow: '#FEE75C',
+                            border: '#3F4147',
+                            input: '#383A40'
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-out',
+                        'slide-up': 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                        'pulse-soft': 'pulseSoft 2s infinite',
+                        'scale-in': 'scaleIn 0.2s ease-out'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' }
+                        },
+                        pulseSoft: {
+                            '0%, 100%': { opacity: '1' },
+                            '50%': { opacity: '0.7' }
+                        },
+                        scaleIn: {
+                            '0%': { transform: 'scale(0.95)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    
+    <style>
+        /* Custom Scrollbar in Discord Style */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #2B2D31;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1A1B1E;
+            border-radius: 4px;
+            border: 2px solid #2B2D31;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #111214;
+        }
+        
+        /* Smooth transitions */
+        .tab-content {
+            animation: fadeIn 0.25s ease-out;
+        }
+        
+        /* Input focus styles */
+        input:focus, textarea:focus {
+            box-shadow: 0 0 0 2px rgba(88, 101, 242, 0.3);
+        }
+        
+        /* Server card hover effect */
+        .server-card {
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .server-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.24);
+            border-color: #5865F2;
+        }
+        
+        /* Badge pulse */
+        .online-dot {
+            box-shadow: 0 0 8px rgba(35, 165, 90, 0.6);
+        }
+        
+        /* Glass effect for auth */
+        .glass-auth {
+            backdrop-filter: blur(20px);
+            background: rgba(49, 51, 56, 0.92);
+        }
+    </style>
 </head>
-<body class="h-screen overflow-hidden flex flex-col bg-[#313338] text-[#DBDEE1]">
+<body class="h-screen overflow-hidden flex flex-col bg-discord-bg text-discord-text font-sans antialiased">
 
-    <!-- EKRAN LOGOWANIA / REJESTRACJI -->
-    <div id="auth-screen" class="fixed inset-0 bg-[#1E1F22] z-[1000] flex items-center justify-center p-4">
-        <div class="bg-[#313338] p-8 rounded-xl shadow-2xl w-full max-w-md border border-[#3F4147]">
-            <h1 class="text-2xl font-bold text-white text-center mb-2">EH Portal</h1>
-            <p class="text-sm text-[#B5BAC1] text-center mb-6">Zaloguj się lub załóż konto, aby pisać</p>
+    <!-- ==================== EKRAN LOGOWANIA / REJESTRACJI ==================== -->
+    <div id="auth-screen" class="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-discord-darker/95 backdrop-blur-sm">
+        <div class="glass-auth p-8 rounded-2xl shadow-2xl w-full max-w-md border border-discord-border animate-scale-in">
             
-            <div class="space-y-4">
-                <input type="email" id="auth-email" placeholder="Email (np. nick@wp.pl)" class="w-full bg-[#1E1F22] p-3 rounded outline-none ring-1 ring-[#3F4147] focus:ring-[#5865F2]">
-                <input type="password" id="auth-pass" placeholder="Hasło" class="w-full bg-[#1E1F22] p-3 rounded outline-none ring-1 ring-[#3F4147] focus:ring-[#5865F2]">
-                
-                <div class="flex gap-2">
-                    <button onclick="handleAuth('login')" class="flex-1 bg-[#5865F2] hover:bg-[#4752C4] py-3 rounded font-bold transition-all">Zaloguj</button>
-                    <button onclick="handleAuth('register')" class="flex-1 border border-[#5865F2] text-[#5865F2] hover:bg-[#5865F2] hover:text-white py-3 rounded font-bold transition-all">Zarejestruj</button>
+            <!-- Logo -->
+            <div class="flex flex-col items-center mb-8">
+                <div class="w-16 h-16 bg-discord-blurple rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-discord-blurple/25">
+                    <i data-lucide="gamepad-2" class="w-8 h-8 text-white"></i>
                 </div>
+                <h1 class="text-2xl font-bold text-white tracking-tight">EH Portal</h1>
+                <p class="text-sm text-discord-muted mt-1">Centrum serwerów RolePlay</p>
+            </div>
+            
+            <!-- Formularz -->
+            <div class="space-y-4">
+                <div class="relative">
+                    <i data-lucide="mail" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-discord-muted"></i>
+                    <input type="email" id="auth-email" placeholder="Email (np. nick@wp.pl)" 
+                           class="w-full bg-discord-input pl-10 pr-4 py-3 rounded-xl text-sm outline-none ring-1 ring-discord-border focus:ring-discord-blurple transition-all placeholder:text-discord-muted/60">
+                </div>
+                
+                <div class="relative">
+                    <i data-lucide="lock" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-discord-muted"></i>
+                    <input type="password" id="auth-pass" placeholder="Hasło" 
+                           class="w-full bg-discord-input pl-10 pr-4 py-3 rounded-xl text-sm outline-none ring-1 ring-discord-border focus:ring-discord-blurple transition-all placeholder:text-discord-muted/60">
+                </div>
+                
+                <div class="flex gap-3 pt-2">
+                    <button onclick="handleAuth('login')" 
+                            class="flex-1 bg-discord-blurple hover:bg-[#4752C4] py-3 rounded-xl font-semibold text-sm transition-all hover:shadow-lg hover:shadow-discord-blurple/20 active:scale-95">
+                        Zaloguj się
+                    </button>
+                    <button onclick="handleAuth('register')" 
+                            class="flex-1 border border-discord-border hover:border-discord-blurple text-discord-text hover:text-white py-3 rounded-xl font-semibold text-sm transition-all hover:bg-discord-hover active:scale-95">
+                        Rejestracja
+                    </button>
+                </div>
+                
+                <p class="text-[10px] text-discord-muted/50 text-center mt-4">
+                    Dołączając akceptujesz regulamin • EH Portal 2026
+                </p>
             </div>
         </div>
     </div>
 
-    <!-- GŁÓWNA APLIKACJA -->
-    <div id="main-app" class="hidden flex h-full">
-        <!-- Sidebar -->
-        <nav class="w-[72px] bg-[#1E1F22] flex flex-col items-center py-3 space-y-4">
-            <div onclick="showTab('chat')" class="w-12 h-12 bg-[#5865F2] rounded-[16px] flex items-center justify-center text-white cursor-pointer hover:rounded-[12px] transition-all"><i data-lucide="message-square"></i></div>
-            <div onclick="showTab('apply')" class="w-12 h-12 bg-[#3BA55C] rounded-[24px] flex items-center justify-center text-white cursor-pointer hover:rounded-[16px] transition-all"><i data-lucide="plus-circle"></i></div>
-            <div id="admin-btn" onclick="showTab('admin')" class="hidden w-12 h-12 bg-[#ED4245] rounded-[24px] flex items-center justify-center text-white cursor-pointer hover:rounded-[16px] transition-all"><i data-lucide="shield"></i></div>
-            <div onclick="logout()" class="mt-auto w-12 h-12 bg-[#4E5058] rounded-[24px] flex items-center justify-center text-white cursor-pointer hover:rounded-[16px] transition-all"><i data-lucide="log-out"></i></div>
+    <!-- ==================== GŁÓWNA APLIKACJA ==================== -->
+    <div id="main-app" class="hidden flex h-full w-full">
+        
+        <!-- Lewy Sidebar (nawigacja główna) -->
+        <nav class="w-[72px] bg-discord-sidebar flex flex-col items-center py-3 space-y-2 border-r border-black/20 shrink-0">
+            <!-- Logo górne -->
+            <div class="w-12 h-12 bg-discord-blurple rounded-2xl flex items-center justify-center text-white font-bold text-xl mb-2 shadow-md">
+                EH
+            </div>
+            
+            <div class="w-8 border-t border-discord-border my-1"></div>
+            
+            <!-- Przycisk: Czat -->
+            <button onclick="showTab('chat')" id="nav-chat" 
+                    class="nav-btn w-12 h-12 rounded-2xl flex items-center justify-center text-discord-muted hover:text-white hover:bg-discord-blurple hover:rounded-xl transition-all duration-200 group relative active:scale-90"
+                    title="Czat ogólny">
+                <i data-lucide="message-square" class="w-6 h-6"></i>
+                <span class="absolute left-14 bg-black text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">Czat</span>
+            </button>
+            
+            <!-- Przycisk: Wyszukiwarka serwerów -->
+            <button onclick="showTab('discover')" id="nav-discover" 
+                    class="nav-btn w-12 h-12 rounded-2xl flex items-center justify-center text-discord-muted hover:text-white hover:bg-discord-green hover:rounded-xl transition-all duration-200 group relative active:scale-90"
+                    title="Odkrywaj serwery">
+                <i data-lucide="compass" class="w-6 h-6"></i>
+                <span class="absolute left-14 bg-black text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">Przeglądaj</span>
+            </button>
+            
+            <!-- Przycisk: Dodaj serwer -->
+            <button onclick="showTab('apply')" id="nav-apply" 
+                    class="nav-btn w-12 h-12 rounded-2xl flex items-center justify-center text-discord-muted hover:text-white hover:bg-discord-green hover:rounded-xl transition-all duration-200 group relative active:scale-90"
+                    title="Dodaj własny serwer">
+                <i data-lucide="plus-circle" class="w-6 h-6"></i>
+                <span class="absolute left-14 bg-black text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">Dodaj serwer</span>
+            </button>
+            
+            <!-- Przycisk: Admin (ukryty domyślnie) -->
+            <button onclick="showTab('admin')" id="admin-btn" 
+                    class="nav-btn hidden w-12 h-12 rounded-2xl flex items-center justify-center text-discord-muted hover:text-white hover:bg-discord-red hover:rounded-xl transition-all duration-200 group relative active:scale-90"
+                    title="Panel administratora">
+                <i data-lucide="shield-alert" class="w-6 h-6"></i>
+                <span class="absolute left-14 bg-black text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">Admin</span>
+            </button>
+            
+            <div class="flex-1"></div>
+            
+            <!-- Przycisk: Wyloguj -->
+            <button onclick="logout()" 
+                    class="w-12 h-12 rounded-2xl flex items-center justify-center text-discord-muted hover:text-white hover:bg-discord-red/80 hover:rounded-xl transition-all duration-200 group relative active:scale-90"
+                    title="Wyloguj się">
+                <i data-lucide="log-out" class="w-6 h-6"></i>
+                <span class="absolute left-14 bg-black text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">Wyloguj</span>
+            </button>
         </nav>
 
-        <!-- Main Area -->
-        <div class="flex-1 flex flex-col">
-            <header class="h-12 border-b border-[#1F2124] flex items-center px-4 font-bold bg-[#313338] justify-between">
-                <div># <span id="header-text" class="ml-2 uppercase text-sm">ogólny</span></div>
-                <button onclick="checkAdmin()" class="text-[10px] text-[#4E5058] hover:text-white">Panel Admina</button>
+        <!-- Główny kontener treści -->
+        <div class="flex-1 flex flex-col min-w-0 bg-discord-bg">
+            
+            <!-- Header z nazwą kanału -->
+            <header class="h-12 min-h-[48px] border-b border-discord-border bg-discord-bg flex items-center px-5 shadow-sm z-10">
+                <div class="flex items-center gap-3">
+                    <span class="text-discord-muted text-xl font-light">#</span>
+                    <span id="header-text" class="font-semibold text-white text-sm tracking-wide uppercase">CZAT OGÓLNY</span>
+                </div>
+                <div class="ml-auto flex items-center gap-3">
+                    <span id="online-indicator" class="flex items-center gap-1.5 text-xs text-discord-muted">
+                        <span class="w-2 h-2 bg-discord-green rounded-full online-dot animate-pulse-soft"></span>
+                        <span id="online-count">0</span> online
+                    </span>
+                    <button onclick="checkAdmin()" class="text-[11px] text-discord-muted hover:text-discord-blurple transition-colors font-medium">
+                        <i data-lucide="shield" class="w-3.5 h-3.5 inline mr-1"></i>Admin
+                    </button>
+                </div>
             </header>
 
-            <!-- Widok: Czat -->
-            <div id="tab-chat" class="tab-content flex-1 flex flex-col overflow-hidden p-4">
-                <div id="chat-box" class="flex-1 overflow-y-auto space-y-3 mb-4 pr-2"></div>
-                <div class="bg-[#383A40] rounded-lg p-2 flex">
-                    <input type="text" id="chat-in" class="bg-transparent flex-1 p-2 outline-none text-sm" placeholder="Napisz coś...">
+            <!-- ==================== WIDOK: CZAT ==================== -->
+            <div id="tab-chat" class="tab-content flex-1 flex flex-col overflow-hidden bg-discord-bg">
+                <!-- Wiadomości -->
+                <div id="chat-box" class="flex-1 overflow-y-auto px-5 py-4 space-y-1.5 scroll-smooth"></div>
+                
+                <!-- Input czatu -->
+                <div class="px-4 pb-4 pt-1">
+                    <div class="bg-discord-input rounded-xl flex items-center px-4 ring-1 ring-transparent focus-within:ring-discord-blurple/50 transition-all">
+                        <i data-lucide="plus-circle" class="w-5 h-5 text-discord-muted mr-3 cursor-pointer hover:text-white transition-colors"></i>
+                        <input type="text" id="chat-in" 
+                               class="bg-transparent flex-1 py-3.5 outline-none text-sm placeholder:text-discord-muted/50" 
+                               placeholder="Napisz wiadomość na czacie...">
+                        <i data-lucide="send" class="w-5 h-5 text-discord-muted ml-3 cursor-pointer hover:text-white transition-colors" 
+                           onclick="sendChatMessage()"></i>
+                    </div>
                 </div>
             </div>
 
-            <!-- Widok: Zgłoszenia -->
-            <div id="tab-apply" class="tab-content hidden flex-1 p-8 overflow-y-auto">
-                <div class="max-w-lg mx-auto bg-[#2B2D31] p-6 rounded-xl border border-[#3F4147]">
-                    <h2 class="text-xl font-bold mb-4">DODAJ SWÓJ SERWER</h2>
-                    <input id="s-name" placeholder="Nazwa Serwera" class="w-full bg-[#1E1F22] p-3 mb-3 rounded outline-none border border-transparent focus:border-[#3BA55C]">
-                    <input id="s-code" placeholder="Kod EH (np. 111-222)" class="w-full bg-[#1E1F22] p-3 mb-3 rounded outline-none">
-                    <textarea id="s-desc" placeholder="Opis/Regulamin..." class="w-full bg-[#1E1F22] p-3 mb-3 rounded h-32 outline-none"></textarea>
-                    <button onclick="sendSrv()" class="w-full bg-[#3BA55C] py-3 rounded font-bold uppercase hover:bg-[#2d7d46]">Wyślij do Admina</button>
+            <!-- ==================== WIDOK: WYSZUKIWARKA SERWERÓW (DISCORD STYLE) ==================== -->
+            <div id="tab-discover" class="tab-content hidden flex-1 flex flex-col overflow-hidden">
+                <!-- Górny panel wyszukiwania -->
+                <div class="bg-discord-dark border-b border-discord-border p-6">
+                    <div class="max-w-4xl mx-auto">
+                        <h2 class="text-2xl font-bold text-white mb-2 flex items-center gap-2">
+                            <i data-lucide="compass" class="w-7 h-7 text-discord-green"></i>
+                            Odkrywaj serwery RolePlay
+                        </h2>
+                        <p class="text-discord-muted text-sm mb-4">Przeglądaj serwery dodane przez społeczność EH Portal</p>
+                        
+                        <!-- Pole wyszukiwania -->
+                        <div class="relative">
+                            <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-discord-muted"></i>
+                            <input type="text" id="search-input" oninput="filterServers()"
+                                   placeholder="Szukaj serwera po nazwie, kodzie EH lub opisie..."
+                                   class="w-full bg-discord-darker pl-12 pr-4 py-3.5 rounded-xl text-sm outline-none ring-1 ring-discord-border focus:ring-discord-blurple transition-all placeholder:text-discord-muted/50">
+                        </div>
+                        
+                        <!-- Statystyki -->
+                        <div class="flex gap-4 mt-3 text-xs text-discord-muted">
+                            <span id="servers-count">0</span> serwerów dostępnych
+                            <span class="text-discord-border">•</span>
+                            <span id="filtered-count">0</span> wyświetlanych
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Lista serwerów -->
+                <div id="servers-grid" class="flex-1 overflow-y-auto p-6">
+                    <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Serwery będą wstawiane dynamicznie -->
+                    </div>
+                    <div id="no-servers-message" class="hidden text-center py-20">
+                        <i data-lucide="search-x" class="w-16 h-16 text-discord-muted/30 mx-auto mb-4"></i>
+                        <p class="text-discord-muted text-lg">Nie znaleziono serwerów</p>
+                        <p class="text-discord-muted/50 text-sm">Spróbuj zmienić kryteria wyszukiwania</p>
+                    </div>
                 </div>
             </div>
 
-            <!-- Widok: Admin (Tylko dla Ciebie) -->
-            <div id="tab-admin" class="tab-content hidden flex-1 p-8 overflow-y-auto">
-                <h2 class="text-2xl font-bold text-red-500 mb-6">OCZEKUJĄCE ZGŁOSZENIA</h2>
-                <div id="admin-list" class="space-y-4"></div>
+            <!-- ==================== WIDOK: DODAJ SERWER ==================== -->
+            <div id="tab-apply" class="tab-content hidden flex-1 overflow-y-auto">
+                <div class="max-w-lg mx-auto p-8 animate-slide-up">
+                    <div class="bg-discord-dark p-8 rounded-2xl border border-discord-border shadow-xl">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-10 h-10 bg-discord-green/20 rounded-xl flex items-center justify-center">
+                                <i data-lucide="server" class="w-5 h-5 text-discord-green"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-xl font-bold text-white">Dodaj swój serwer</h2>
+                                <p class="text-xs text-discord-muted">Zgłoś serwer do zatwierdzenia przez admina</p>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-xs font-semibold text-discord-muted uppercase tracking-wide mb-1.5 block">Nazwa serwera</label>
+                                <input id="s-name" placeholder="np. Grand RP, Epsilon RolePlay" 
+                                       class="w-full bg-discord-darker p-3 rounded-xl text-sm outline-none ring-1 ring-discord-border focus:ring-discord-green transition-all">
+                            </div>
+                            
+                            <div>
+                                <label class="text-xs font-semibold text-discord-muted uppercase tracking-wide mb-1.5 block">Kod EH</label>
+                                <input id="s-code" placeholder="np. 111-222" 
+                                       class="w-full bg-discord-darker p-3 rounded-xl text-sm outline-none ring-1 ring-discord-border focus:ring-discord-green transition-all font-mono">
+                            </div>
+                            
+                            <div>
+                                <label class="text-xs font-semibold text-discord-muted uppercase tracking-wide mb-1.5 block">Opis / Regulamin</label>
+                                <textarea id="s-desc" rows="5" placeholder="Opisz swój serwer, zasady, co oferuje..."
+                                          class="w-full bg-discord-darker p-3 rounded-xl text-sm outline-none ring-1 ring-discord-border focus:ring-discord-green transition-all resize-none"></textarea>
+                            </div>
+                            
+                            <button onclick="sendSrv()" 
+                                    class="w-full bg-discord-green hover:bg-[#1E8A4A] py-3.5 rounded-xl font-semibold text-sm transition-all hover:shadow-lg hover:shadow-discord-green/20 active:scale-95 mt-2">
+                                <i data-lucide="upload" class="w-4 h-4 inline mr-2"></i>
+                                Wyślij do zatwierdzenia
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== WIDOK: PANEL ADMINA ==================== -->
+            <div id="tab-admin" class="tab-content hidden flex-1 overflow-y-auto">
+                <div class="max-w-3xl mx-auto p-8 animate-slide-up">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-10 h-10 bg-discord-red/20 rounded-xl flex items-center justify-center">
+                            <i data-lucide="shield-alert" class="w-5 h-5 text-discord-red"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold text-discord-red">Panel Administratora</h2>
+                            <p class="text-xs text-discord-muted">Zarządzaj zgłoszeniami serwerów</p>
+                        </div>
+                    </div>
+                    
+                    <div id="admin-list" class="space-y-3">
+                        <!-- Zgłoszenia będą wstawiane dynamicznie -->
+                    </div>
+                    
+                    <div id="no-requests-message" class="hidden text-center py-16">
+                        <i data-lucide="inbox" class="w-16 h-16 text-discord-muted/30 mx-auto mb-4"></i>
+                        <p class="text-discord-muted text-lg">Brak oczekujących zgłoszeń</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- ==================== SKRYPTY ==================== -->
     <script>
-        // TWOJA KONFIGURACJA Z OBRAZ_4.PNG
+        // --- KONFIGURACJA FIREBASE ---
         const firebaseConfig = {
             apiKey: "AIzaSyAG7tgMkouem-YVmGCPOYO64Fb3zUGWs7w",
             authDomain: "eh-portal-87389.firebaseapp.com",
@@ -92,93 +383,308 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // Autoryzacja
+        // --- ZMIENNE GLOBALNE ---
+        let allServers = [];
+        let currentUser = null;
+        let isAdmin = false;
+
+        // --- AUTORYZACJA ---
         async function handleAuth(type) {
-            const email = document.getElementById('auth-email').value;
-            const pass = document.getElementById('auth-pass').value;
-            if(!email || !pass) return alert("Wypełnij pola!");
+            const email = document.getElementById('auth-email').value.trim();
+            const pass = document.getElementById('auth-pass').value.trim();
+            
+            if (!email || !pass) {
+                showToast('Wypełnij wszystkie pola!', 'warning');
+                return;
+            }
+            
             try {
-                if(type === 'register') {
+                if (type === 'register') {
                     await auth.createUserWithEmailAndPassword(email, pass);
-                    alert("Konto założone!");
+                    showToast('Konto założone pomyślnie!', 'success');
                 } else {
                     await auth.signInWithEmailAndPassword(email, pass);
+                    showToast('Zalogowano pomyślnie!', 'success');
                 }
-            } catch (e) { alert("Błąd: " + e.message); }
+            } catch (e) {
+                let message = e.message;
+                if (e.code === 'auth/user-not-found') message = 'Nie znaleziono użytkownika';
+                if (e.code === 'auth/wrong-password') message = 'Nieprawidłowe hasło';
+                if (e.code === 'auth/email-already-in-use') message = 'Email już zajęty';
+                showToast('Błąd: ' + message, 'error');
+            }
         }
 
         auth.onAuthStateChanged(user => {
             if (user) {
+                currentUser = user;
                 document.getElementById('auth-screen').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
                 loadChat();
+                loadServers();
+                updateOnlineCount();
+                showTab('chat');
             } else {
+                currentUser = null;
                 document.getElementById('auth-screen').classList.remove('hidden');
                 document.getElementById('main-app').classList.add('hidden');
             }
         });
 
-        function logout() { auth.signOut(); }
+        function logout() {
+            auth.signOut();
+            isAdmin = false;
+            document.getElementById('admin-btn').classList.add('hidden');
+            showToast('Wylogowano', 'info');
+        }
 
-        // Czat
+        // --- SYSTEM POWIADOMIEŃ (TOAST) ---
+        function showToast(message, type = 'info') {
+            const colors = {
+                success: 'bg-discord-green',
+                error: 'bg-discord-red',
+                warning: 'bg-discord-yellow text-black',
+                info: 'bg-discord-blurple'
+            };
+            
+            const toast = document.createElement('div');
+            toast.className = `fixed bottom-6 left-1/2 -translate-x-1/2 z-[2000] px-6 py-3 rounded-xl text-sm font-medium shadow-2xl ${colors[type]} text-white animate-slide-up`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // --- NAWIGACJA ---
+        function showTab(tabName) {
+            // Ukryj wszystkie zakładki
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            
+            // Pokaż wybraną
+            const tabElement = document.getElementById('tab-' + tabName);
+            if (tabElement) {
+                tabElement.classList.remove('hidden');
+            }
+            
+            // Aktualizuj header
+            const headerText = document.getElementById('header-text');
+            const titles = {
+                'chat': '💬 Czat ogólny',
+                'discover': '🧭 Przeglądaj serwery',
+                'apply': '➕ Dodaj serwer',
+                'admin': '🛡️ Panel admina'
+            };
+            headerText.textContent = titles[tabName] || tabName.toUpperCase();
+            
+            // Aktualizuj aktywny przycisk nawigacji
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('bg-discord-blurple/30', 'text-white'));
+            const activeNav = document.getElementById('nav-' + tabName);
+            if (activeNav) {
+                activeNav.classList.add('bg-discord-blurple/30', 'text-white');
+            }
+            
+            // Ładuj dane dla konkretnych widoków
+            if (tabName === 'admin') loadAdminRequests();
+            if (tabName === 'discover') filterServers();
+            
+            // Przewiń czat na dół
+            if (tabName === 'chat') {
+                setTimeout(() => {
+                    const chatBox = document.getElementById('chat-box');
+                    if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
+                }, 100);
+            }
+        }
+
+        // --- CZAT ---
         function loadChat() {
             db.ref('messages').limitToLast(50).on('value', snap => {
                 const box = document.getElementById('chat-box');
-                box.innerHTML = "";
-                snap.forEach(c => {
-                    const m = c.val();
-                    box.innerHTML += `<div class="bg-[#2B2D31] p-3 rounded-md border-l-4 border-[#5865F2]"><span class="font-bold text-[#5865F2] text-xs">${m.user}</span><p class="text-sm">${m.text}</p></div>`;
+                if (!box) return;
+                
+                box.innerHTML = '';
+                const messages = [];
+                snap.forEach(child => messages.push({ key: child.key, ...child.val() }));
+                
+                messages.forEach((m, index) => {
+                    const isCurrentUser = currentUser && m.userId === currentUser.uid;
+                    const messageElement = document.createElement('div');
+                    messageElement.className = `flex items-start gap-3 px-2 py-1 rounded-lg hover:bg-discord-hover/50 transition-colors animate-fade-in ${isCurrentUser ? 'flex-row-reverse' : ''}`;
+                    
+                    messageElement.innerHTML = `
+                        <div class="w-9 h-9 rounded-full bg-discord-blurple/30 flex items-center justify-center text-xs font-bold text-discord-blurple shrink-0">
+                            ${m.user ? m.user.charAt(0).toUpperCase() : '?'}
+                        </div>
+                        <div class="${isCurrentUser ? 'text-right' : ''}">
+                            <div class="flex items-center gap-2 ${isCurrentUser ? 'flex-row-reverse' : ''}">
+                                <span class="font-semibold text-sm ${isCurrentUser ? 'text-discord-blurple' : 'text-white'}">${m.user || 'Anonim'}</span>
+                                <span class="text-[10px] text-discord-muted">${m.timestamp ? new Date(m.timestamp).toLocaleTimeString('pl-PL', {hour: '2-digit', minute:'2-digit'}) : ''}</span>
+                            </div>
+                            <p class="text-sm text-discord-text mt-0.5">${escapeHtml(m.text)}</p>
+                        </div>
+                    `;
+                    box.appendChild(messageElement);
                 });
+                
                 box.scrollTop = box.scrollHeight;
             });
         }
 
-        document.getElementById('chat-in').onkeypress = (e) => {
-            if(e.key === 'Enter' && e.target.value.trim()) {
-                db.ref('messages').push({ user: auth.currentUser.email.split('@')[0], text: e.target.value });
-                e.target.value = "";
-            }
-        };
-
-        // Serwery
-        function sendSrv() {
-            const name = document.getElementById('s-name').value;
-            if(!name) return alert("Podaj nazwę!");
-            db.ref('requests').push({
-                user: auth.currentUser.email,
-                name: name,
-                code: document.getElementById('s-code').value,
-                desc: document.getElementById('s-desc').value
-            }).then(() => { alert("Zgłoszenie wysłane!"); showTab('chat'); });
+        function sendChatMessage() {
+            const input = document.getElementById('chat-in');
+            const text = input.value.trim();
+            if (!text || !currentUser) return;
+            
+            db.ref('messages').push({
+                user: currentUser.email.split('@')[0],
+                userId: currentUser.uid,
+                text: text,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            });
+            
+            input.value = '';
+            input.focus();
         }
 
-        // Admin
-        function checkAdmin() {
-            const code = prompt("Kod Admina:");
-            if(code === "EH2026") {
-                document.getElementById('admin-btn').classList.remove('hidden');
-                alert("Panel Admina odblokowany w menu po lewej!");
-            }
-        }
+        document.getElementById('chat-in')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendChatMessage();
+        });
 
-        function showTab(t) {
-            document.querySelectorAll('.tab-content').forEach(x => x.classList.add('hidden'));
-            document.getElementById('tab-'+t).classList.remove('hidden');
-            if(t === 'admin') loadAdmin();
-        }
-
-        function loadAdmin() {
-            db.ref('requests').on('value', snap => {
-                const box = document.getElementById('admin-list');
-                box.innerHTML = "";
-                snap.forEach(c => {
-                    const r = c.val();
-                    box.innerHTML += `<div class="bg-[#2B2D31] p-4 rounded border border-red-900"><h3 class="font-bold">${r.name} (${r.code})</h3><p class="text-xs text-gray-400">${r.desc}</p><button onclick="db.ref('requests/${c.key}').remove()" class="mt-2 text-red-500 text-[10px] font-bold">USUŃ</button></div>`;
+        // --- SERWERY (WYSZUKIWARKA DISCORD-STYLE) ---
+        function loadServers() {
+            db.ref('approved_servers').on('value', snap => {
+                allServers = [];
+                snap.forEach(child => {
+                    allServers.push({ id: child.key, ...child.val() });
                 });
+                updateServerCounts();
+                filterServers();
             });
         }
 
-        lucide.createIcons();
-    </script>
-</body>
-</html>
+        function filterServers() {
+            const searchTerm = document.getElementById('search-input')?.value.toLowerCase() || '';
+            const grid = document.getElementById('servers-grid');
+            const noMessage = document.getElementById('no-servers-message');
+            
+            if (!grid) return;
+            
+            const filtered = allServers.filter(server => 
+                server.name?.toLowerCase().includes(searchTerm) ||
+                server.code?.toLowerCase().includes(searchTerm) ||
+                server.desc?.toLowerCase().includes(searchTerm) ||
+                server.user?.toLowerCase().includes(searchTerm)
+            );
+            
+            document.getElementById('filtered-count').textContent = filtered.length;
+            
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                noMessage?.classList.remove('hidden');
+            } else {
+                noMessage?.classList.add('hidden');
+                grid.innerHTML = filtered.map(server => createServerCard(server)).join('');
+            }
+            
+            // Odśwież ikony Lucide
+            setTimeout(() => lucide.createIcons(), 50);
+        }
+
+        function createServerCard(server) {
+            const randomGradient = [
+                'from-discord-blurple to-blue-600',
+                'from-discord-green to-emerald-600',
+                'from-purple-600 to-pink-600',
+                'from-orange-500 to-red-600',
+                'from-cyan-500 to-blue-600'
+            ][Math.floor(Math.random() * 5)];
+            
+            return `
+                <div class="server-card bg-discord-dark rounded-xl border border-discord-border overflow-hidden group cursor-pointer hover:border-discord-blurple/50 transition-all duration-200">
+                    <!-- Banner -->
+                    <div class="h-24 bg-gradient-to-br ${randomGradient} relative flex items-center justify-center">
+                        <span class="text-3xl font-black text-white/20">${server.name?.charAt(0) || '?'}</span>
+                        <div class="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-discord-dark to-transparent"></div>
+                    </div>
+                    
+                    <!-- Treść -->
+                    <div class="p-4">
+                        <div class="flex items-start justify-between mb-2">
+                            <h3 class="font-bold text-white text-sm truncate">${escapeHtml(server.name || 'Bez nazwy')}</h3>
+                            ${server.code ? `<span class="text-[10px] bg-discord-darker px-2 py-0.5 rounded-full text-discord-muted font-mono shrink-0">${escapeHtml(server.code)}</span>` : ''}
+                        </div>
+                        
+                        <p class="text-xs text-discord-muted line-clamp-3 mb-3">${escapeHtml(server.desc || 'Brak opisu')}</p>
+                        
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-2 h-2 bg-discord-green rounded-full online-dot"></span>
+                                <span class="text-[10px] text-discord-muted">Online</span>
+                            </div>
+                            <span class="text-[10px] text-discord-muted">przez ${escapeHtml(server.user || '???')}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateServerCounts() {
+            const countEl = document.getElementById('servers-count');
+            const filteredEl = document.getElementById('filtered-count');
+            if (countEl) countEl.textContent = allServers.length;
+            if (filteredEl) filteredEl.textContent = allServers.length;
+        }
+
+        // --- DODAWANIE SERWERA (ZGŁOSZENIE) ---
+        function sendSrv() {
+            if (!currentUser) {
+                showToast('Musisz być zalogowany!', 'warning');
+                return;
+            }
+            
+            const name = document.getElementById('s-name').value.trim();
+            const code = document.getElementById('s-code').value.trim();
+            const desc = document.getElementById('s-desc').value.trim();
+            
+            if (!name) {
+                showToast('Podaj nazwę serwera!', 'warning');
+                return;
+            }
+            
+            db.ref('requests').push({
+                user: currentUser.email,
+                userId: currentUser.uid,
+                name: name,
+                code: code,
+                desc: desc,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            }).then(() => {
+                showToast('Zgłoszenie wysłane do admina! ✅', 'success');
+                document.getElementById('s-name').value = '';
+                document.getElementById('s-code').value = '';
+                document.getElementById('s-desc').value = '';
+                showTab('discover');
+            }).catch(() => {
+                showToast('Błąd wysyłania zgłoszenia', 'error');
+            });
+        }
+
+        // --- PANEL ADMINA ---
+        function checkAdmin() {
+            const code = prompt('🔑 Podaj kod administratora:');
+            if (code === 'EH2026') {
+                isAdmin = true;
+                document.getElementById('admin-btn').classList.remove('hidden');
+                showToast('Panel admina odblokowany! 🛡️', 'success');
+                showTab('admin');
+            } else if (code !== null) {
+                showToast('Nieprawidłowy kod!', 'error');
+            }
+        }
+
+        function loadAdminRequests() {
+            if (!is
