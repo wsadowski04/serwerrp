@@ -2,36 +2,9 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EH Portal • Serwery RP</title>
-    
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        discord: {
-                            bg: '#313338',
-                            sidebar: '#1E1F22',
-                            dark: '#2B2D31',
-                            darker: '#1E1F22',
-                            hover: '#35373C',
-                            text: '#DBDEE1',
-                            muted: '#949BA4',
-                            blurple: '#5865F2',
-                            green: '#23A55A',
-                            red: '#ED4245',
-                            yellow: '#FEE75C',
-                            border: '#3F4147',
-                            input: '#383A40'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <!-- Firebase -->
@@ -40,18 +13,11 @@
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #2B2D31;
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #1A1B1E;
-            border-radius: 3px;
-        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #2B2D31; }
+        ::-webkit-scrollbar-thumb { background: #1A1B1E; border-radius: 3px; }
         
         .server-card {
             transition: all 0.2s ease;
@@ -59,7 +25,7 @@
         }
         .server-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
             border-color: #5865F2 !important;
         }
         
@@ -72,42 +38,34 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .animate-fadeIn {
-            animation: fadeIn 0.3s ease-out;
-        }
+        .animate-fadeIn { animation: fadeIn 0.3s ease-out; }
         
         @keyframes slideUp {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .animate-slideUp {
-            animation: slideUp 0.4s ease-out;
-        }
     </style>
 </head>
-<body class="h-screen overflow-hidden flex flex-col bg-[#313338] text-[#DBDEE1]" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+<body class="h-screen overflow-hidden flex flex-col bg-[#313338] text-[#DBDEE1]">
 
     <!-- EKRAN LOGOWANIA -->
     <div id="auth-screen" class="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-[#1E1F22]">
-        <div class="bg-[#313338] p-8 rounded-2xl shadow-2xl w-full max-w-md border border-[#3F4147] animate-fadeIn">
+        <div class="bg-[#313338] p-8 rounded-2xl shadow-2xl w-full max-w-md border border-[#3F4147]">
             
-            <div class="flex flex-col items-center mb-6">
-                <div class="w-16 h-16 bg-[#5865F2] rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-[#5865F2] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                     <span class="text-2xl font-bold text-white">EH</span>
                 </div>
                 <h1 class="text-2xl font-bold text-white">EH Portal</h1>
                 <p class="text-sm text-[#949BA4] mt-1">Centrum serwerów RolePlay</p>
             </div>
             
-            <!-- Login Admin -->
             <div class="space-y-4">
-                <div class="relative">
-                    <input type="password" id="admin-code-input" placeholder="Wpisz kod administratora" 
-                           class="w-full bg-[#1E1F22] px-4 py-3 rounded-xl text-sm outline-none ring-1 ring-[#3F4147] focus:ring-[#5865F2] transition-all placeholder:text-[#949BA4]">
-                </div>
+                <input type="password" id="admin-code" placeholder="Wpisz kod administratora" 
+                       class="w-full bg-[#1E1F22] px-4 py-3 rounded-xl text-sm outline-none ring-1 ring-[#3F4147] focus:ring-[#5865F2] transition-all">
                 
                 <button onclick="loginAsAdmin()" 
-                        class="w-full bg-[#5865F2] hover:bg-[#4752C4] py-3 rounded-xl font-semibold text-sm transition-all active:scale-95">
+                        class="w-full bg-[#5865F2] hover:bg-[#4752C4] py-3 rounded-xl font-semibold text-sm transition-all">
                     🔑 Zaloguj jako Admin
                 </button>
                 
@@ -121,7 +79,7 @@
                 </div>
                 
                 <button onclick="loginAsGuest()" 
-                        class="w-full border border-[#3F4147] hover:border-[#5865F2] text-white py-3 rounded-xl font-semibold text-sm transition-all active:scale-95">
+                        class="w-full border border-[#3F4147] hover:border-[#5865F2] text-white py-3 rounded-xl font-semibold text-sm transition-all">
                     👤 Wejdź jako gość
                 </button>
             </div>
@@ -129,75 +87,70 @@
     </div>
 
     <!-- GŁÓWNA APLIKACJA -->
-    <div id="main-app" class="hidden flex h-full w-full">
+    <div id="main-app" class="hidden h-full w-full flex">
         
         <!-- Sidebar -->
-        <nav class="w-[72px] bg-[#1E1F22] flex flex-col items-center py-3 space-y-2 border-r border-black/20">
+        <div class="w-[72px] bg-[#1E1F22] flex flex-col items-center py-3 space-y-2 border-r border-black/20">
             <div class="w-12 h-12 bg-[#5865F2] rounded-2xl flex items-center justify-center text-white font-bold text-lg mb-2">
                 EH
             </div>
             
             <div class="w-8 border-t border-[#3F4147] my-1"></div>
             
-            <!-- Czat -->
             <button onclick="switchTab('chat')" id="nav-chat" 
-                    class="nav-btn w-12 h-12 rounded-2xl flex items-center justify-center text-[#949BA4] hover:text-white hover:bg-[#5865F2] hover:rounded-xl transition-all duration-200 relative group">
+                    class="nav-btn w-12 h-12 rounded-2xl flex items-center justify-center text-[#949BA4] hover:text-white hover:bg-[#5865F2] transition-all relative group">
                 <i data-lucide="message-square" class="w-6 h-6"></i>
-                <span class="absolute left-14 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">Czat</span>
+                <span class="absolute left-14 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap z-50">Czat</span>
             </button>
             
-            <!-- Przeglądaj serwery -->
             <button onclick="switchTab('discover')" id="nav-discover" 
-                    class="nav-btn w-12 h-12 rounded-2xl flex items-center justify-center text-[#949BA4] hover:text-white hover:bg-[#23A55A] hover:rounded-xl transition-all duration-200 relative group">
+                    class="nav-btn w-12 h-12 rounded-2xl flex items-center justify-center text-[#949BA4] hover:text-white hover:bg-[#23A55A] transition-all relative group">
                 <i data-lucide="compass" class="w-6 h-6"></i>
-                <span class="absolute left-14 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">Serwery</span>
+                <span class="absolute left-14 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap z-50">Serwery</span>
             </button>
             
-            <!-- Dodaj serwer -->
             <button onclick="switchTab('add')" id="nav-add" 
-                    class="nav-btn w-12 h-12 rounded-2xl flex items-center justify-center text-[#949BA4] hover:text-white hover:bg-[#23A55A] hover:rounded-xl transition-all duration-200 relative group">
+                    class="nav-btn w-12 h-12 rounded-2xl flex items-center justify-center text-[#949BA4] hover:text-white hover:bg-[#23A55A] transition-all relative group">
                 <i data-lucide="plus-circle" class="w-6 h-6"></i>
-                <span class="absolute left-14 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">Dodaj</span>
+                <span class="absolute left-14 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap z-50">Dodaj</span>
             </button>
             
-            <!-- Admin -->
             <button onclick="switchTab('admin')" id="admin-btn" 
-                    class="nav-btn hidden w-12 h-12 rounded-2xl flex items-center justify-center text-[#949BA4] hover:text-white hover:bg-[#ED4245] hover:rounded-xl transition-all duration-200 relative group">
+                    class="nav-btn hidden w-12 h-12 rounded-2xl flex items-center justify-center text-[#949BA4] hover:text-white hover:bg-[#ED4245] transition-all relative group">
                 <i data-lucide="shield-alert" class="w-6 h-6"></i>
-                <span class="absolute left-14 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">Admin</span>
+                <span class="absolute left-14 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap z-50">Admin</span>
             </button>
             
             <div class="flex-1"></div>
             
-            <!-- Wyloguj -->
             <button onclick="logout()" 
-                    class="w-12 h-12 rounded-2xl flex items-center justify-center text-[#949BA4] hover:text-white hover:bg-[#ED4245] hover:rounded-xl transition-all duration-200 relative group">
+                    class="w-12 h-12 rounded-2xl flex items-center justify-center text-[#949BA4] hover:text-white hover:bg-[#ED4245] transition-all relative group">
                 <i data-lucide="log-out" class="w-6 h-6"></i>
             </button>
-        </nav>
+        </div>
 
-        <!-- Main -->
+        <!-- Main Content -->
         <div class="flex-1 flex flex-col min-w-0 bg-[#313338]">
             
             <!-- Header -->
-            <header class="h-12 min-h-[48px] border-b border-[#3F4147] bg-[#313338] flex items-center px-5 shadow-sm">
+            <div class="h-12 min-h-[48px] border-b border-[#3F4147] bg-[#313338] flex items-center px-5">
                 <span class="text-[#949BA4] text-xl mr-3">#</span>
-                <span id="header-title" class="font-semibold text-white text-sm uppercase tracking-wide">CZAT OGÓLNY</span>
-                <div class="ml-auto flex items-center gap-3">
+                <span id="header-title" class="font-semibold text-white text-sm uppercase">CZAT OGÓLNY</span>
+                <div class="ml-auto">
                     <span id="user-badge" class="text-xs bg-[#5865F2]/20 text-[#5865F2] px-3 py-1 rounded-full font-medium"></span>
                 </div>
-            </header>
+            </div>
 
             <!-- CZAT -->
-            <div id="tab-chat" class="tab-content flex-1 flex flex-col overflow-hidden bg-[#313338]">
+            <div id="tab-chat" class="tab-content flex-1 flex flex-col overflow-hidden">
                 <div id="chat-messages" class="flex-1 overflow-y-auto px-5 py-4 space-y-2"></div>
                 
                 <div class="px-4 pb-4 pt-1">
-                    <div class="bg-[#383A40] rounded-xl flex items-center px-4 ring-1 ring-transparent focus-within:ring-[#5865F2]/50 transition-all">
+                    <div class="bg-[#383A40] rounded-xl flex items-center px-4">
                         <input type="text" id="chat-input" 
                                class="bg-transparent flex-1 py-3.5 outline-none text-sm placeholder:text-[#949BA4]/50" 
-                               placeholder="Napisz wiadomość...">
-                        <button onclick="sendMessage()" class="text-[#949BA4] hover:text-white transition-colors p-1">
+                               placeholder="Napisz wiadomość... (Enter aby wysłać)">
+                        <button onclick="sendMessage()" class="text-[#949BA4] hover:text-white p-1">
                             <i data-lucide="send" class="w-5 h-5"></i>
                         </button>
                     </div>
@@ -209,16 +162,14 @@
                 <div class="bg-[#2B2D31] border-b border-[#3F4147] p-6">
                     <div class="max-w-5xl mx-auto">
                         <h2 class="text-2xl font-bold text-white mb-2">🧭 Odkrywaj serwery RolePlay</h2>
-                        <p class="text-[#949BA4] text-sm mb-4">Przeglądaj zweryfikowane i dodane przez społeczność serwery</p>
+                        <p class="text-[#949BA4] text-sm mb-4">Przeglądaj serwery dodane przez społeczność</p>
                         
-                        <div class="relative">
-                            <input type="text" id="search-input" oninput="filterServers()"
-                                   placeholder="Szukaj po nazwie, kodzie EH lub opisie..."
-                                   class="w-full bg-[#1E1F22] px-4 py-3.5 rounded-xl text-sm outline-none ring-1 ring-[#3F4147] focus:ring-[#5865F2] transition-all placeholder:text-[#949BA4]/50">
-                        </div>
+                        <input type="text" id="search-input" oninput="filterServers()"
+                               placeholder="Szukaj po nazwie, kodzie EH lub opisie..."
+                               class="w-full bg-[#1E1F22] px-4 py-3.5 rounded-xl text-sm outline-none ring-1 ring-[#3F4147] focus:ring-[#5865F2] transition-all">
                         
                         <div class="flex gap-4 mt-3 text-xs text-[#949BA4]">
-                            <span>Łącznie: <span id="total-servers">0</span></span>
+                            <span>Serwerów: <span id="total-servers">0</span></span>
                             <span>•</span>
                             <span>Wyświetlono: <span id="filtered-servers">0</span></span>
                         </div>
@@ -228,30 +179,42 @@
                 <div id="servers-container" class="flex-1 overflow-y-auto p-6">
                     <div id="servers-grid" class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                     <div id="no-servers" class="hidden text-center py-20">
-                        <p class="text-[#949BA4] text-lg">😔 Nie znaleziono serwerów</p>
+                        <p class="text-[#949BA4] text-lg">😔 Brak serwerów</p>
+                        <p class="text-[#949BA4] text-sm mt-2">Dodaj pierwszy serwer!</p>
                     </div>
                 </div>
             </div>
 
             <!-- DODAJ SERWER -->
             <div id="tab-add" class="tab-content hidden flex-1 overflow-y-auto">
-                <div class="max-w-lg mx-auto p-8 animate-fadeIn">
+                <div class="max-w-lg mx-auto p-8">
                     <div class="bg-[#2B2D31] p-8 rounded-2xl border border-[#3F4147]">
                         <h2 class="text-xl font-bold text-white mb-2">➕ Dodaj serwer</h2>
-                        <p class="text-xs text-[#949BA4] mb-6" id="add-info-text">Twoje zgłoszenie zostanie sprawdzone przez admina</p>
+                        <p class="text-xs text-[#949BA4] mb-6" id="add-info">Wypełnij formularz aby dodać serwer</p>
                         
                         <div class="space-y-4">
-                            <input id="server-name" placeholder="Nazwa serwera *" 
-                                   class="w-full bg-[#1E1F22] p-3 rounded-xl text-sm outline-none ring-1 ring-[#3F4147] focus:ring-[#23A55A] transition-all">
-                            <input id="server-code" placeholder="Kod EH (np. 111-222)" 
-                                   class="w-full bg-[#1E1F22] p-3 rounded-xl text-sm outline-none ring-1 ring-[#3F4147] focus:ring-[#23A55A] transition-all font-mono">
-                            <textarea id="server-desc" rows="5" placeholder="Opis serwera, regulamin, co oferuje..."
-                                      class="w-full bg-[#1E1F22] p-3 rounded-xl text-sm outline-none ring-1 ring-[#3F4147] focus:ring-[#23A55A] transition-all resize-none"></textarea>
+                            <div>
+                                <label class="text-xs text-[#949BA4] block mb-1">Nazwa serwera *</label>
+                                <input id="server-name" placeholder="np. Grand RP, Epsilon RolePlay" 
+                                       class="w-full bg-[#1E1F22] p-3 rounded-xl text-sm outline-none ring-1 ring-[#3F4147] focus:ring-[#23A55A] transition-all">
+                            </div>
+                            <div>
+                                <label class="text-xs text-[#949BA4] block mb-1">Kod EH</label>
+                                <input id="server-code" placeholder="np. 111-222" 
+                                       class="w-full bg-[#1E1F22] p-3 rounded-xl text-sm outline-none ring-1 ring-[#3F4147] focus:ring-[#23A55A] transition-all font-mono">
+                            </div>
+                            <div>
+                                <label class="text-xs text-[#949BA4] block mb-1">Opis serwera</label>
+                                <textarea id="server-desc" rows="5" placeholder="Opisz swój serwer, zasady, co oferuje..."
+                                          class="w-full bg-[#1E1F22] p-3 rounded-xl text-sm outline-none ring-1 ring-[#3F4147] focus:ring-[#23A55A] transition-all resize-none"></textarea>
+                            </div>
                             
                             <button onclick="addServer()" 
-                                    class="w-full bg-[#23A55A] hover:bg-[#1E8A4A] py-3.5 rounded-xl font-semibold text-sm transition-all active:scale-95">
+                                    class="w-full bg-[#23A55A] hover:bg-[#1E8A4A] py-3.5 rounded-xl font-semibold text-sm transition-all">
                                 📤 Wyślij
                             </button>
+                            
+                            <div id="add-status" class="text-center text-sm hidden"></div>
                         </div>
                     </div>
                 </div>
@@ -259,11 +222,11 @@
 
             <!-- PANEL ADMINA -->
             <div id="tab-admin" class="tab-content hidden flex-1 overflow-y-auto">
-                <div class="max-w-4xl mx-auto p-8 animate-fadeIn">
+                <div class="max-w-4xl mx-auto p-8">
                     <h2 class="text-2xl font-bold text-[#ED4245] mb-2">🛡️ Panel Administratora</h2>
                     <p class="text-sm text-[#949BA4] mb-6">Zarządzaj zgłoszeniami i weryfikuj serwery</p>
                     
-                    <!-- Sekcja: Oczekujące zgłoszenia -->
+                    <!-- Oczekujące zgłoszenia -->
                     <div class="mb-8">
                         <h3 class="text-lg font-bold text-white mb-3">📋 Oczekujące zgłoszenia</h3>
                         <div id="admin-requests" class="space-y-3"></div>
@@ -272,10 +235,10 @@
                         </div>
                     </div>
                     
-                    <!-- Sekcja: Wszystkie serwery (do weryfikacji) -->
+                    <!-- Wszystkie serwery -->
                     <div>
-                        <h3 class="text-lg font-bold text-white mb-3">✅ Zarządzaj serwerami (weryfikacja)</h3>
-                        <div id="admin-all-servers" class="space-y-3"></div>
+                        <h3 class="text-lg font-bold text-white mb-3">✅ Zarządzaj serwerami</h3>
+                        <div id="admin-servers" class="space-y-3"></div>
                     </div>
                 </div>
             </div>
@@ -283,7 +246,7 @@
     </div>
 
     <script>
-        // ============ FIREBASE ============
+        // ============ KONFIGURACJA FIREBASE ============
         const firebaseConfig = {
             apiKey: "AIzaSyAG7tgMkouem-YVmGCPOYO64Fb3zUGWs7w",
             authDomain: "eh-portal-87389.firebaseapp.com",
@@ -294,24 +257,38 @@
             appId: "1:393601722792:web:f5549c97312a2236f0d59d"
         };
         
+        // Inicjalizacja Firebase
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+        const database = firebase.database();
         
-        // ============ STAN APLIKACJI ============
+        console.log('Firebase zainicjalizowany');
+        
+        // Test połączenia
+        database.ref('.info/connected').on('value', function(snap) {
+            if (snap.val() === true) {
+                console.log('✅ Połączono z Firebase!');
+            } else {
+                console.log('❌ Brak połączenia z Firebase');
+            }
+        });
+        
+        // ============ ZMIENNE ============
         let currentUser = null;
         let isAdmin = false;
         let allServers = [];
         
         // ============ LOGOWANIE ============
         function loginAsAdmin() {
-            const code = document.getElementById('admin-code-input').value.trim();
+            const code = document.getElementById('admin-code').value.trim();
+            console.log('Próba logowania admina, kod:', code);
+            
             if (code === 'EH2026') {
                 isAdmin = true;
                 currentUser = { name: 'Administrator', type: 'admin' };
                 enterApp();
-                showNotification('Zalogowano jako Administrator 🛡️', 'success');
+                alert('✅ Zalogowano jako Administrator!');
             } else {
-                showNotification('❌ Nieprawidłowy kod!', 'error');
+                alert('❌ Nieprawidłowy kod! Użyj: EH2026');
             }
         }
         
@@ -321,19 +298,21 @@
             const randomName = names[Math.floor(Math.random() * names.length)] + Math.floor(Math.random() * 999);
             currentUser = { name: randomName, type: 'guest' };
             enterApp();
-            showNotification('Witaj ' + randomName + '! 👋', 'info');
         }
         
         function enterApp() {
+            console.log('Wchodzę do aplikacji jako:', currentUser);
+            
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('main-app').classList.remove('hidden');
             document.getElementById('user-badge').textContent = isAdmin ? '🛡️ Admin' : '👤 ' + currentUser.name;
             
             if (isAdmin) {
                 document.getElementById('admin-btn').classList.remove('hidden');
-                document.getElementById('add-info-text').textContent = 'Jako admin dodajesz serwer od razu (zweryfikowany)';
+                document.getElementById('add-info').textContent = 'Jako admin dodajesz serwer od razu (zweryfikowany)';
             }
             
+            // Załaduj dane
             loadChat();
             loadServers();
             switchTab('chat');
@@ -345,91 +324,75 @@
             document.getElementById('admin-btn').classList.add('hidden');
             document.getElementById('auth-screen').classList.remove('hidden');
             document.getElementById('main-app').classList.add('hidden');
-            document.getElementById('admin-code-input').value = '';
+            document.getElementById('admin-code').value = '';
         }
         
         // Enter w polu kodu
-        document.getElementById('admin-code-input').addEventListener('keypress', function(e) {
+        document.getElementById('admin-code').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') loginAsAdmin();
         });
         
-        // ============ NOTYFIKACJE ============
-        function showNotification(message, type) {
-            const colors = {
-                success: '#23A55A',
-                error: '#ED4245',
-                info: '#5865F2'
-            };
-            
-            const notif = document.createElement('div');
-            notif.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: ${colors[type] || '#5865F2'};
-                color: white;
-                padding: 12px 24px;
-                border-radius: 12px;
-                font-size: 14px;
-                font-weight: 500;
-                z-index: 9999;
-                box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-                animation: slideUp 0.3s ease-out;
-            `;
-            notif.textContent = message;
-            document.body.appendChild(notif);
-            
-            setTimeout(() => {
-                notif.style.opacity = '0';
-                notif.style.transition = 'opacity 0.3s';
-                setTimeout(() => notif.remove(), 300);
-            }, 3000);
-        }
-        
         // ============ NAWIGACJA ============
         function switchTab(tab) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            const tabEl = document.getElementById('tab-' + tab);
-            if (tabEl) tabEl.classList.remove('hidden');
+            console.log('Przełączam na zakładkę:', tab);
             
+            // Ukryj wszystkie
+            document.querySelectorAll('.tab-content').forEach(function(el) {
+                el.classList.add('hidden');
+            });
+            
+            // Pokaż wybraną
+            const tabEl = document.getElementById('tab-' + tab);
+            if (tabEl) {
+                tabEl.classList.remove('hidden');
+            }
+            
+            // Aktualizuj tytuł
             const titles = {
                 'chat': '💬 CZAT OGÓLNY',
                 'discover': '🧭 PRZEGLĄDAJ SERWERY',
                 'add': '➕ DODAJ SERWER',
                 'admin': '🛡️ PANEL ADMINA'
             };
-            document.getElementById('header-title').textContent = titles[tab] || tab.toUpperCase();
+            document.getElementById('header-title').textContent = titles[tab] || tab;
             
-            document.querySelectorAll('.nav-btn').forEach(btn => {
+            // Aktualizuj nawigację
+            document.querySelectorAll('.nav-btn').forEach(function(btn) {
                 btn.classList.remove('bg-[#5865F2]/30', 'text-white');
             });
             const navBtn = document.getElementById('nav-' + tab);
-            if (navBtn) navBtn.classList.add('bg-[#5865F2]/30', 'text-white');
+            if (navBtn) {
+                navBtn.classList.add('bg-[#5865F2]/30', 'text-white');
+            }
             
-            if (tab === 'admin') loadAdminPanel();
-            if (tab === 'discover') renderServers(allServers);
+            // Ładuj dane dla konkretnych zakładek
+            if (tab === 'admin' && isAdmin) {
+                loadAdminPanel();
+            }
+            if (tab === 'discover') {
+                renderServers(allServers);
+            }
         }
         
         // ============ CZAT ============
         function loadChat() {
-            db.ref('messages').limitToLast(50).on('value', function(snapshot) {
+            console.log('Ładuję czat...');
+            
+            database.ref('messages').limitToLast(50).on('value', function(snapshot) {
                 const box = document.getElementById('chat-messages');
                 box.innerHTML = '';
                 
                 snapshot.forEach(function(child) {
                     const msg = child.val();
                     const div = document.createElement('div');
-                    div.className = 'flex items-start gap-3 px-2 py-1 rounded-lg hover:bg-[#35373C]/50 transition-colors animate-fadeIn';
+                    div.className = 'flex items-start gap-3 px-2 py-1 rounded-lg hover:bg-[#35373C]/50 animate-fadeIn';
                     div.innerHTML = `
-                        <div class="w-8 h-8 rounded-full bg-[#5865F2]/30 flex items-center justify-center text-xs font-bold text-[#5865F2] shrink-0">
+                        <div class="w-8 h-8 rounded-full bg-[#5865F2]/30 flex items-center justify-center text-xs font-bold text-[#5865F2]">
                             ${(msg.user || '?').charAt(0).toUpperCase()}
                         </div>
                         <div>
-                            <div class="flex items-center gap-2">
-                                <span class="font-semibold text-sm text-white">${escapeHtml(msg.user || 'Anonim')}</span>
-                                <span class="text-[10px] text-[#949BA4]">${msg.time || ''}</span>
-                            </div>
+                            <span class="font-semibold text-sm text-white">${escapeHtml(msg.user || 'Anonim')}</span>
+                            <span class="text-[10px] text-[#949BA4] ml-2">${msg.time || ''}</span>
                             <p class="text-sm text-[#DBDEE1]">${escapeHtml(msg.text)}</p>
                         </div>
                     `;
@@ -443,16 +406,28 @@
         function sendMessage() {
             const input = document.getElementById('chat-input');
             const text = input.value.trim();
-            if (!text || !currentUser) return;
+            
+            if (!text) return;
+            if (!currentUser) {
+                alert('Nie jesteś zalogowany!');
+                return;
+            }
+            
+            console.log('Wysyłam wiadomość:', text);
             
             const now = new Date();
             const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
             
-            db.ref('messages').push({
+            database.ref('messages').push({
                 user: currentUser.name,
                 text: text,
                 time: time,
                 timestamp: firebase.database.ServerValue.TIMESTAMP
+            }).then(function() {
+                console.log('✅ Wiadomość wysłana');
+            }).catch(function(error) {
+                console.error('❌ Błąd wysyłania:', error);
+                alert('Błąd wysyłania wiadomości: ' + error.message);
             });
             
             input.value = '';
@@ -465,7 +440,9 @@
         
         // ============ SERWERY ============
         function loadServers() {
-            db.ref('servers').on('value', function(snapshot) {
+            console.log('Ładuję serwery...');
+            
+            database.ref('servers').on('value', function(snapshot) {
                 allServers = [];
                 snapshot.forEach(function(child) {
                     allServers.push({
@@ -474,12 +451,18 @@
                     });
                 });
                 
+                console.log('Załadowano serwerów:', allServers.length);
+                
                 document.getElementById('total-servers').textContent = allServers.length;
                 document.getElementById('filtered-servers').textContent = allServers.length;
                 
-                if (document.getElementById('tab-discover').classList.contains('hidden') === false) {
+                // Jeśli jesteśmy na zakładce discover, renderuj
+                const discoverTab = document.getElementById('tab-discover');
+                if (discoverTab && !discoverTab.classList.contains('hidden')) {
                     renderServers(allServers);
                 }
+            }, function(error) {
+                console.error('❌ Błąd ładowania serwerów:', error);
             });
         }
         
@@ -488,11 +471,11 @@
             
             let filtered = allServers;
             if (query) {
-                filtered = allServers.filter(s => 
-                    (s.name && s.name.toLowerCase().includes(query)) ||
-                    (s.code && s.code.toLowerCase().includes(query)) ||
-                    (s.desc && s.desc.toLowerCase().includes(query))
-                );
+                filtered = allServers.filter(function(s) {
+                    return (s.name && s.name.toLowerCase().includes(query)) ||
+                           (s.code && s.code.toLowerCase().includes(query)) ||
+                           (s.desc && s.desc.toLowerCase().includes(query));
+                });
             }
             
             document.getElementById('filtered-servers').textContent = filtered.length;
@@ -515,25 +498,20 @@
             
             grid.innerHTML = servers.map(function(server) {
                 const gradient = ['#5865F2', '#23A55A', '#ED4245', '#FEE75C', '#EB459E'][Math.floor(Math.random() * 5)];
-                const verifiedBadge = server.verified ? `
-                    <span class="verified-badge text-white text-[10px] px-2 py-0.5 rounded-full font-bold flex items-center gap-1" title="Zweryfikowany serwer">
-                        ✓ Zweryfikowany
-                    </span>
-                ` : '';
                 
                 return `
                     <div class="server-card bg-[#2B2D31] rounded-xl border border-[#3F4147] overflow-hidden">
                         <div class="h-20 flex items-center justify-center relative" style="background: linear-gradient(135deg, ${gradient}33, ${gradient}66);">
                             <span class="text-3xl font-black opacity-20">${(server.name || '?').charAt(0).toUpperCase()}</span>
-                            ${server.verified ? '<span class="absolute top-2 right-2 text-[#5865F2]">✓</span>' : ''}
+                            ${server.verified ? '<span class="absolute top-2 right-2 text-[#5865F2] font-bold">✓</span>' : ''}
                         </div>
                         <div class="p-4">
                             <div class="flex items-start justify-between mb-2">
                                 <h3 class="font-bold text-white text-sm">${escapeHtml(server.name || 'Bez nazwy')}</h3>
                                 ${server.code ? `<span class="text-[10px] bg-[#1E1F22] px-2 py-0.5 rounded text-[#949BA4] font-mono">${escapeHtml(server.code)}</span>` : ''}
                             </div>
-                            ${verifiedBadge}
-                            <p class="text-xs text-[#949BA4] mt-2 line-clamp-3">${escapeHtml(server.desc || 'Brak opisu')}</p>
+                            ${server.verified ? '<span class="verified-badge text-white text-[10px] px-2 py-0.5 rounded-full font-bold inline-block mb-2">✓ Zweryfikowany</span>' : ''}
+                            <p class="text-xs text-[#949BA4] mt-2">${escapeHtml(server.desc || 'Brak opisu')}</p>
                             <div class="flex items-center justify-between mt-3 pt-3 border-t border-[#3F4147]">
                                 <span class="text-[10px] text-[#949BA4]">Dodane przez: ${escapeHtml(server.addedBy || 'Nieznany')}</span>
                                 <span class="w-2 h-2 bg-[#23A55A] rounded-full"></span>
@@ -542,8 +520,6 @@
                     </div>
                 `;
             }).join('');
-            
-            lucide.createIcons();
         }
         
         // ============ DODAWANIE SERWERA ============
@@ -551,62 +527,100 @@
             const name = document.getElementById('server-name').value.trim();
             const code = document.getElementById('server-code').value.trim();
             const desc = document.getElementById('server-desc').value.trim();
+            const statusDiv = document.getElementById('add-status');
             
+            console.log('Próba dodania serwera:', { name, code, desc });
+            
+            // Walidacja
             if (!name) {
-                showNotification('⚠️ Podaj nazwę serwera!', 'error');
+                alert('⚠️ Podaj nazwę serwera!');
                 return;
             }
             
             if (!currentUser) {
-                showNotification('⚠️ Nie jesteś zalogowany!', 'error');
+                alert('⚠️ Nie jesteś zalogowany!');
                 return;
             }
+            
+            // Pokaż status ładowania
+            statusDiv.classList.remove('hidden');
+            statusDiv.className = 'text-center text-sm mt-3 text-[#5865F2]';
+            statusDiv.textContent = '⏳ Wysyłanie...';
             
             const serverData = {
                 name: name,
                 code: code,
                 desc: desc,
                 addedBy: currentUser.name,
-                verified: isAdmin ? true : false,  // Admin dodaje od razu zweryfikowany
+                verified: isAdmin ? true : false,
                 timestamp: firebase.database.ServerValue.TIMESTAMP
             };
             
+            console.log('Dane do zapisania:', serverData);
+            
             if (isAdmin) {
-                // Admin dodaje bezpośrednio do serwerów
-                db.ref('servers').push(serverData)
-                    .then(function() {
-                        showNotification('✅ Serwer dodany i zweryfikowany!', 'success');
-                        clearAddForm();
-                        switchTab('discover');
+                // Admin dodaje bezpośrednio
+                database.ref('servers').push(serverData)
+                    .then(function(ref) {
+                        console.log('✅ Serwer dodany przez admina, ID:', ref.key);
+                        statusDiv.className = 'text-center text-sm mt-3 text-[#23A55A]';
+                        statusDiv.textContent = '✅ Serwer dodany i zweryfikowany!';
+                        
+                        // Wyczyść formularz
+                        document.getElementById('server-name').value = '';
+                        document.getElementById('server-code').value = '';
+                        document.getElementById('server-desc').value = '';
+                        
+                        // Ukryj status po 3 sekundach
+                        setTimeout(function() {
+                            statusDiv.classList.add('hidden');
+                        }, 3000);
+                        
+                        // Przełącz na przeglądanie
+                        setTimeout(function() {
+                            switchTab('discover');
+                        }, 1000);
                     })
                     .catch(function(error) {
-                        showNotification('❌ Błąd: ' + error.message, 'error');
+                        console.error('❌ Błąd dodawania:', error);
+                        statusDiv.className = 'text-center text-sm mt-3 text-[#ED4245]';
+                        statusDiv.textContent = '❌ Błąd: ' + error.message;
+                        alert('❌ Błąd dodawania serwera: ' + error.message);
                     });
             } else {
                 // Gość wysyła zgłoszenie
-                db.ref('requests').push(serverData)
-                    .then(function() {
-                        showNotification('✅ Zgłoszenie wysłane do admina!', 'success');
-                        clearAddForm();
+                database.ref('requests').push(serverData)
+                    .then(function(ref) {
+                        console.log('✅ Zgłoszenie wysłane, ID:', ref.key);
+                        statusDiv.className = 'text-center text-sm mt-3 text-[#23A55A]';
+                        statusDiv.textContent = '✅ Zgłoszenie wysłane! Admin je sprawdzi.';
+                        
+                        // Wyczyść formularz
+                        document.getElementById('server-name').value = '';
+                        document.getElementById('server-code').value = '';
+                        document.getElementById('server-desc').value = '';
+                        
+                        setTimeout(function() {
+                            statusDiv.classList.add('hidden');
+                        }, 3000);
                     })
                     .catch(function(error) {
-                        showNotification('❌ Błąd: ' + error.message, 'error');
+                        console.error('❌ Błąd wysyłania:', error);
+                        statusDiv.className = 'text-center text-sm mt-3 text-[#ED4245]';
+                        statusDiv.textContent = '❌ Błąd: ' + error.message;
+                        alert('❌ Błąd wysyłania zgłoszenia: ' + error.message);
                     });
             }
-        }
-        
-        function clearAddForm() {
-            document.getElementById('server-name').value = '';
-            document.getElementById('server-code').value = '';
-            document.getElementById('server-desc').value = '';
         }
         
         // ============ PANEL ADMINA ============
         function loadAdminPanel() {
             if (!isAdmin) return;
             
-            // Załaduj zgłoszenia
-            db.ref('requests').on('value', function(snapshot) {
+            console.log('Ładuję panel admina...');
+            
+            // Zgłoszenia
+            database.ref('requests').on('value', function(snapshot) {
                 const container = document.getElementById('admin-requests');
                 const noRequests = document.getElementById('no-requests');
                 container.innerHTML = '';
@@ -619,19 +633,19 @@
                     const div = document.createElement('div');
                     div.className = 'bg-[#2B2D31] p-4 rounded-xl border border-[#3F4147]';
                     div.innerHTML = `
-                        <div class="flex items-start justify-between">
-                            <div class="flex-1">
+                        <div class="flex justify-between items-start">
+                            <div>
                                 <h4 class="font-bold text-white">${escapeHtml(req.name)}</h4>
-                                <p class="text-xs text-[#949BA4] mt-1">Kod: ${escapeHtml(req.code || 'brak')} | Od: ${escapeHtml(req.addedBy)}</p>
-                                <p class="text-sm text-[#DBDEE1] mt-2">${escapeHtml(req.desc || 'Brak opisu')}</p>
+                                <p class="text-xs text-[#949BA4]">Kod: ${escapeHtml(req.code || 'brak')} | Od: ${escapeHtml(req.addedBy)}</p>
+                                <p class="text-sm mt-2">${escapeHtml(req.desc || 'Brak opisu')}</p>
                             </div>
                             <div class="flex gap-2 ml-4">
                                 <button onclick="approveRequest('${child.key}')" 
-                                        class="bg-[#23A55A]/20 text-[#23A55A] px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-[#23A55A]/30 transition-all whitespace-nowrap">
+                                        class="bg-[#23A55A] text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-[#1E8A4A]">
                                     ✅ Zatwierdź
                                 </button>
-                                <button onclick="rejectRequest('${child.key}')" 
-                                        class="bg-[#ED4245]/20 text-[#ED4245] px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-[#ED4245]/30 transition-all whitespace-nowrap">
+                                <button onclick="deleteRequest('${child.key}')" 
+                                        class="bg-[#ED4245] text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-[#C03537]">
                                     ❌ Odrzuć
                                 </button>
                             </div>
@@ -647,9 +661,9 @@
                 }
             });
             
-            // Załaduj wszystkie serwery (do zarządzania weryfikacją)
-            db.ref('servers').on('value', function(snapshot) {
-                const container = document.getElementById('admin-all-servers');
+            // Wszystkie serwery
+            database.ref('servers').on('value', function(snapshot) {
+                const container = document.getElementById('admin-servers');
                 container.innerHTML = '';
                 
                 snapshot.forEach(function(child) {
@@ -664,67 +678,55 @@
                             <div>
                                 <span class="font-bold text-white">${escapeHtml(server.name)}</span>
                                 <span class="text-xs text-[#949BA4] ml-2">${escapeHtml(server.code || '')}</span>
-                                ${server.verified ? '<span class="text-[#5865F2] text-xs ml-2">✓ Zweryfikowany</span>' : '<span class="text-[#949BA4] text-xs ml-2">Niezweryfikowany</span>'}
+                                ${server.verified ? '<span class="text-[#5865F2] text-xs ml-2">✓ Zweryfikowany</span>' : '<span class="text-[#ED4245] text-xs ml-2">✕ Niezweryfikowany</span>'}
                             </div>
                         </div>
                         <div class="flex gap-2">
-                            ${!server.verified ? `
-                                <button onclick="verifyServer('${child.key}')" 
-                                        class="bg-[#5865F2]/20 text-[#5865F2] px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-[#5865F2]/30 transition-all">
-                                    ✓ Zweryfikuj
-                                </button>
-                            ` : `
-                                <button onclick="unverifyServer('${child.key}')" 
-                                        class="bg-[#FEE75C]/20 text-[#FEE75C] px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-[#FEE75C]/30 transition-all">
-                                    ✕ Cofnij weryfikację
-                                </button>
-                            `}
-                            <button onclick="deleteServer('${child.key}')" 
-                                    class="bg-[#ED4245]/20 text-[#ED4245] px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-[#ED4245]/30 transition-all">
-                                🗑 Usuń
-                            </button>
+                            ${!server.verified ? 
+                                `<button onclick="verifyServer('${child.key}')" class="bg-[#5865F2] text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-[#4752C4]">✓ Weryfikuj</button>` :
+                                `<button onclick="unverifyServer('${child.key}')" class="bg-[#FEE75C] text-black px-3 py-1.5 rounded-lg text-xs font-bold">✕ Cofnij weryfikację</button>`
+                            }
+                            <button onclick="deleteServer('${child.key}')" class="bg-[#ED4245] text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-[#C03537]">🗑 Usuń</button>
                         </div>
                     `;
                     container.appendChild(div);
                 });
-                
-                lucide.createIcons();
             });
         }
         
         function approveRequest(requestId) {
-            db.ref('requests/' + requestId).once('value').then(function(snapshot) {
+            database.ref('requests/' + requestId).once('value').then(function(snapshot) {
                 const data = snapshot.val();
-                data.verified = false; // Zgłoszenia nie są automatycznie weryfikowane
+                data.verified = false;
                 
-                db.ref('servers').push(data).then(function() {
-                    db.ref('requests/' + requestId).remove();
-                    showNotification('✅ Serwer zatwierdzony!', 'success');
+                database.ref('servers').push(data).then(function() {
+                    database.ref('requests/' + requestId).remove();
+                    alert('✅ Serwer zatwierdzony!');
                 });
             });
         }
         
-        function rejectRequest(requestId) {
-            if (confirm('Odrzucić to zgłoszenie? Zostanie usunięte.')) {
-                db.ref('requests/' + requestId).remove();
-                showNotification('🗑 Zgłoszenie odrzucone', 'info');
+        function deleteRequest(requestId) {
+            if (confirm('Odrzucić to zgłoszenie?')) {
+                database.ref('requests/' + requestId).remove();
+                alert('Zgłoszenie odrzucone');
             }
         }
         
         function verifyServer(serverId) {
-            db.ref('servers/' + serverId + '/verified').set(true);
-            showNotification('✓ Serwer zweryfikowany! (niebieski ptaszek)', 'success');
+            database.ref('servers/' + serverId + '/verified').set(true);
+            alert('✅ Serwer zweryfikowany! (niebieski ptaszek)');
         }
         
         function unverifyServer(serverId) {
-            db.ref('servers/' + serverId + '/verified').set(false);
-            showNotification('Weryfikacja cofnięta', 'info');
+            database.ref('servers/' + serverId + '/verified').set(false);
+            alert('Weryfikacja cofnięta');
         }
         
         function deleteServer(serverId) {
-            if (confirm('Na pewno chcesz USUNĄĆ ten serwer? Tej operacji nie można cofnąć!')) {
-                db.ref('servers/' + serverId).remove();
-                showNotification('🗑 Serwer usunięty', 'info');
+            if (confirm('NA PEWNO usunąć ten serwer?')) {
+                database.ref('servers/' + serverId).remove();
+                alert('Serwer usunięty');
             }
         }
         
@@ -737,6 +739,7 @@
         }
         
         // ============ INICJALIZACJA ============
+        console.log('Aplikacja gotowa');
         lucide.createIcons();
     </script>
 </body>
